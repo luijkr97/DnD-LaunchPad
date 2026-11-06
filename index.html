@@ -23,6 +23,7 @@ h1{font-size:22px;margin:0;font-weight:700}
 .pad i{position:absolute;top:5px;right:8px;font-style:normal;font-size:11px;color:var(--mute)}
 .pad span{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
 .pad.empty span{color:var(--mute)}
+.pad.empty::after{content:'';position:absolute;left:50%;top:44%;width:38%;max-width:46px;aspect-ratio:1;transform:translate(-50%,-50%);background:var(--mute);opacity:.5;-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'><circle cx='24' cy='24' r='17' stroke-dasharray='4 6'/><path d='M24 16v16M16 24h16'/></svg>") center/contain no-repeat;mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'><circle cx='24' cy='24' r='17' stroke-dasharray='4 6'/><path d='M24 16v16M16 24h16'/></svg>") center/contain no-repeat;pointer-events:none}
 .pad.hit,.pad.on{background:var(--c);border-color:var(--c);color:#16181d;box-shadow:0 0 22px var(--c);transition:none}
 .pad.hit i,.pad.on i,.pad.hit span,.pad.on span{color:#16181d}
 .m-edit .pad,.m-fx .pad,.m-vol .pad{border-style:dashed}
@@ -42,9 +43,11 @@ h1{font-size:22px;margin:0;font-weight:700}
 footer{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px;color:var(--mute)}
 button.o{font:inherit;font-size:14px;font-weight:700;color:var(--ink);background:transparent;border:2px solid var(--edge);border-radius:10px;padding:6px 12px;cursor:pointer}
 .pad:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
-#ed,#pr,#fx,#man,#pk{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end}
-#ed[hidden],#pr[hidden],#fx[hidden],#man[hidden],#pk[hidden]{display:none}
-#ed,#pr,#fx,#man,#pk{z-index:10}
+#ed,#pr,#fx,#man,#pk,#cs{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end}
+#ed[hidden],#pr[hidden],#fx[hidden],#man[hidden],#pk[hidden],#cs[hidden]{display:none}
+#csl{display:flex;flex-direction:column;gap:8px;overflow:auto}
+#csl .grp{margin:6px 0 0}
+#ed,#pr,#fx,#man,#pk,#cs{z-index:10}
 #pkRec[aria-pressed="true"]{background:#d6402b;border-color:#d6402b;color:#fff}
 #fx,#man{background:var(--bg);align-items:stretch}
 #fx .sheet,#man .sheet{max-height:none;height:100%;border-radius:0;padding-top:calc(16px + env(safe-area-inset-top,0px))}
@@ -291,6 +294,8 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
       <tr><td>Effetto al volo (User)</td><td>Tieni premuto C, R, D o O con un dito e suona il pad con l'altro</td><td>Tieni premuti i tasti <kbd>7</kbd> <kbd>8</kbd> <kbd>9</kbd> <kbd>0</kbd> (C R D O) e suona il pad</td></tr>
       <tr><td>Tornare alla pagina principale</td><td>Tasto Fine</td><td><kbd>Esc</kbd> chiude editor, FX, preset, manuale e le modalità</td></tr>
       <tr><td>Primo avvio</td><td colspan="2">Se accanto all'app c'è il file preset.json, i pad partono già con i suoni e le immagini lì dentro. Per ricominciare da zero usa Svuota su ogni pad, oppure Ripristina tutto.</td></tr>
+      <tr><td>Un suono dal cloud su un pad</td><td colspan="2">Tocca un pad vuoto, Scegli dal cloud, incolla l'indirizzo del cloud la prima volta, poi apri le cartelle (o cerca per nome), ▶ per ascoltare e Usa per caricare</td></tr>
+      <tr><td>Suoni dal cloud</td><td colspan="2">Preset, sezione Suoni dal cloud: scegli un set e tocca Carica due volte. Sostituisce i pad con quei suoni, da qualsiasi dispositivo.</td></tr>
       <tr><td>Preset</td><td colspan="2">Tasto Preset in basso a destra</td></tr>
       <tr><td>Svuotare un pad</td><td colspan="2">Editor, Svuota in fondo (tocca due volte)</td></tr>
     </table>
@@ -394,14 +399,25 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
       </ul>
     </details>
   </div>
+  <p class="note" style="text-align:center;font-size:11px;margin:4px 0 0">Drum Pad · versione 1.55</p>
   <button class="o" id="manDone">Chiudi</button>
 </div></div>
 <div id="pk" hidden><div class="sheet">
   <h2 id="pkT"></h2>
   <button class="o" id="pkFile">Carica un file</button>
+  <button class="o" id="pkCloud">Scegli dal cloud</button>
   <button class="o" id="pkRec" aria-pressed="false">Registra con il microfono</button>
   <p class="note" id="pkMsg" aria-live="polite"></p>
   <button class="o" id="pkX">Annulla</button>
+</div></div>
+<div id="cs" hidden><div class="sheet">
+  <h2 id="csT">Suoni dal cloud</h2>
+  <div class="row"><input type="text" id="csU" placeholder="Indirizzo del cloud (https://…)" aria-label="Indirizzo del cloud" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false"><button class="o fit" id="csGo">Cerca</button></div>
+  <input type="text" id="csQ" placeholder="Cerca un suono" aria-label="Cerca un suono" hidden>
+  <div class="row" id="csNav" hidden style="align-items:center"><button class="o fit" id="csBack">‹ Indietro</button><span id="csCr" class="note" style="flex:1"></span></div>
+  <p class="note" id="csM" aria-live="polite"></p>
+  <div id="csl"></div>
+  <button class="o" id="csX">Chiudi</button>
 </div></div>
 <div id="pr" hidden><div class="sheet">
   <h2>Preset</h2>
@@ -417,6 +433,11 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
     <button class="o" id="cSave">Salva nel cloud</button>
     <div id="cl"></div>
     <p class="note" id="cmsg" aria-live="polite"></p>
+  </div>
+  <div id="web">
+    <p class="grp">Suoni dal cloud</p>
+    <div id="wl"></div>
+    <p class="note" id="wmsg" aria-live="polite"></p>
   </div>
   <div id="pl"></div>
   <p class="note" id="pmsg" aria-live="polite">Caricare un preset sostituisce i suoni di tutti i pad.</p>
@@ -1121,7 +1142,8 @@ $('umd').onclick = () => setUser(!um);
 document.addEventListener('keydown', e => {
   if(e.target.tagName === 'INPUT' && e.target.type !== 'range') return;
   if(e.key === 'Escape'){
-    if(!$('man').hidden) $('man').hidden = true;
+    if(!$('cs').hidden) closeCs();
+    else if(!$('man').hidden) $('man').hidden = true;
     else if(!$('pr').hidden) $('pDone').click();
     else if(fxI >= 0) closeFx();
     else if(ed >= 0) closeEd();
@@ -1510,6 +1532,97 @@ function openPk(i){
 function closePk(){ if(rec){ rec.cancel = true; try{ rec.mr.stop(); }catch(e){} } $('pk').hidden = true; pkI = -1; }
 $('pkFile').onclick = () => { const i = pkI; closePk(); pick(i); };
 $('pkX').onclick = closePk;
+// Campioni dal cloud: un indirizzo web che contiene samples.json e i file audio (per esempio un bucket R2 pubblico)
+const CLOUD_URL = 'https://pub-4a6b9c223ff24dd488c4742ec7c3c69b.r2.dev';
+let csI = -1, csLast = '', csCache = new Map(), csPrev = null;
+const csBase = () => $('csU').value.trim().replace(/\/+$/, '');
+const csGet = k => { try{ return localStorage.getItem(k); }catch(e){ return null; } };
+const csSet = (k, v) => { try{ localStorage.setItem(k, v); }catch(e){} };
+function openCs(i){
+  csI = i; $('csU').value = csGet('dp_cloud') || CLOUD_URL; $('csM').textContent = ''; $('csl').textContent = '';
+  $('csT').textContent = 'Suoni dal cloud \u00b7 Pad ' + (i + 1); $('cs').hidden = false;
+  if(csBase()) csList(); else $('csM').textContent = 'Incolla l\u2019indirizzo del cloud e tocca Cerca.';
+}
+function closeCs(){ csStopPrev(); $('cs').hidden = true; csI = -1; }
+function csStopPrev(){ if(csPrev){ try{ csPrev.stop(); }catch(e){} csPrev = null; } }
+async function csFetch(b, file){
+  const key = b + '/' + file.split('/').map(encodeURIComponent).join('/'); if(csCache.has(key)) return csCache.get(key);
+  const r = await fetch(key); if(!r.ok) throw 0; const ab = await r.arrayBuffer(); csCache.set(key, ab); return ab;
+}
+let csAll = [], csPath = [], csQ = '';
+async function csList(){
+  const b = csBase(); $('csl').textContent = ''; csStopPrev(); csAll = []; csPath = []; csQ = ''; $('csQ').value = ''; $('csNav').hidden = true; $('csQ').hidden = true;
+  if(!/^https:\/\/[^\s]+$/i.test(b)){ $('csM').textContent = 'L’indirizzo deve iniziare con https://'; return; }
+  csSet('dp_cloud', b); $('csM').textContent = 'Cerco i suoni…';
+  let list = null;
+  try{ const r = await fetch(b + '/samples.json', {cache: 'no-cache'}); if(!r.ok) throw 0; const j = await r.json(); list = Array.isArray(j) ? j : j.samples; }catch(e){}
+  list = Array.isArray(list) ? list.filter(x => x && typeof x.name === 'string' && typeof x.file === 'string' && /^[\w.\- ]{1,60}(\/[\w.\- ]{1,60}){0,4}\.(mp3|wav|m4a|ogg|aac)$/i.test(x.file) && !/(^|\/)\.\.?(\/|$)/.test(x.file)) : [];
+  if(!list.length){ $('csM').textContent = 'Non trovo nessun suono a questo indirizzo. Controlla l’indirizzo e che il cloud permetta l’accesso dall’app (CORS).'; return; }
+  csAll = list; $('csQ').hidden = list.length < 8; csRender();
+}
+const csDir = x => x.file.split('/').slice(0, -1);
+function csRow(x, showDir){
+  const b = csBase(), row = document.createElement('div'), nm = document.createElement('b'), pv = document.createElement('button'), us = document.createElement('button');
+  row.className = 'pi'; nm.textContent = String(x.name).slice(0, 40) + (x.loop ? ' · loop' : '');
+  if(showDir && csDir(x).length){ const d = document.createElement('small'); d.textContent = ' ' + csDir(x).join(' / '); d.style.cssText = 'font-weight:500;color:var(--mute)'; nm.append(d); }
+  pv.className = 'o pv'; pv.textContent = '▶'; pv.setAttribute('aria-label', 'Ascolta ' + x.name);
+  us.className = 'o fit'; us.textContent = 'Usa';
+  pv.onclick = async () => {
+    csStopPrev(); pv.disabled = true;
+    try{ const buf = await dec((await csFetch(b, x.file)).slice(0)); A(); const s = ctx.createBufferSource(); s.buffer = buf; s.connect(ctx.destination); s.start(); csPrev = s; }
+    catch(e){ $('csM').textContent = 'Non riesco a scaricare «' + x.name + '».'; }
+    pv.disabled = false;
+  };
+  us.onclick = async () => {
+    const i = csI; if(i < 0) return; us.disabled = true; $('csM').textContent = 'Scarico «' + x.name + '»…';
+    try{
+      const ab = await csFetch(b, x.file); csStopPrev();
+      if(x.loop === true) cfg[i].loop = true;
+      const nome = String(x.name).slice(0, 30);
+      closeCs(); await loadInto(new File([ab], x.file.split('/').pop()), i); names[i] = nome; label(i); put(i);
+      hint('«' + nome + '» caricato sul pad ' + (i + 1) + '.');
+    }catch(e){ $('csM').textContent = 'Non riesco a scaricare «' + x.name + '».'; us.disabled = false; }
+  };
+  row.append(nm, pv, us); return row;
+}
+function csRender(){
+  const box = $('csl'); box.textContent = ''; csStopPrev();
+  const tree = csAll.some(x => csDir(x).length), q = csQ.trim().toLowerCase();
+  const nav = $('csNav'); nav.hidden = !tree || !!q || !csPath.length;
+  $('csCr').textContent = csPath.join(' / ');
+  if(q){
+    const m = csAll.filter(x => (x.name + ' ' + csDir(x).join(' ')).toLowerCase().includes(q));
+    $('csM').textContent = m.length ? m.length + ' risultati.' : 'Nessun suono trovato.';
+    m.forEach(x => box.append(csRow(x, true))); return;
+  }
+  if(!tree){
+    $('csM').textContent = csAll.length + ' suoni. Tocca ▶ per ascoltare, Usa per metterlo nel pad.';
+    let last = null;
+    csAll.forEach(x => {
+      const c = String(x.cat || 'Altro').slice(0, 30);
+      if(c !== last){ const h = document.createElement('p'); h.className = 'grp'; h.textContent = c; box.append(h); last = c; }
+      box.append(csRow(x, false));
+    });
+    return;
+  }
+  const here = csPath.join('/'), under = x => { const d = csDir(x).join('/'); return here === '' || d === here || d.startsWith(here + '/'); };
+  const sub = new Map();
+  csAll.filter(under).forEach(x => { const d = csDir(x); if(d.length > csPath.length){ const k = d[csPath.length]; sub.set(k, (sub.get(k) || 0) + 1); } });
+  $('csM').textContent = csPath.length ? 'Cartella: ' + csPath.join(' / ') : 'Scegli una cartella o cerca un suono.';
+  [...sub].forEach(([k, n]) => {
+    const f = document.createElement('button'); f.className = 'o'; f.style.cssText = 'display:flex;justify-content:space-between;text-align:left';
+    const l = document.createElement('span'), r = document.createElement('span'); l.textContent = '📁 ' + k; r.textContent = n + ' ›';
+    f.append(l, r); f.onclick = () => { csPath.push(k); csRender(); box.scrollTop = 0; }; box.append(f);
+  });
+  csAll.filter(x => csDir(x).join('/') === here).forEach(x => box.append(csRow(x, false)));
+}
+$('csBack').onclick = () => { csPath.pop(); csRender(); };
+$('csQ').addEventListener('input', () => { csQ = $('csQ').value; csRender(); });
+$('pkCloud').onclick = () => { const i = pkI; closePk(); openCs(i); };
+$('csGo').onclick = csList;
+$('csU').addEventListener('keydown', e => { if(e.key === 'Enter') csList(); });
+$('csX').onclick = closeCs;
+$('cs').addEventListener('pointerdown', e => { if(e.target === $('cs')) closeCs(); });
 $('pk').addEventListener('pointerdown', e => { if(e.target === $('pk')) closePk(); });
 $('pkRec').onclick = async () => {
   if(rec){ try{ rec.mr.stop(); }catch(e){} return; }
@@ -1555,7 +1668,7 @@ const tick = () => new Promise(r => setTimeout(r));
 let cAssets = null, cDb = null;
 (async () => {
   try{ if(typeof claude !== 'undefined'){ cAssets = await claude.use('assets'); cDb = await claude.use('db'); } }catch(e){}
-  $('cloud').hidden = !(cAssets && cDb);
+  $('cloud').hidden = !(cAssets && cDb); $('web').hidden = !!(cAssets && cDb);
 })();
 function loadLame(){
   if(window.lamejs) return Promise.resolve(true);
@@ -1671,7 +1784,31 @@ async function cloudLoad(r, btn){
 }
 $('cSave').onclick = cloudSave;
 function closePr(){ $('pr').hidden = true; }
-$('bPre').onclick = () => { for(let i = 0; i < N; i++) if(ed < 0) stopV(i); $('pr').hidden = false; pmsg('Caricare un preset sostituisce i suoni di tutti i pad.'); renderCur(); listPresets(); cmsg(''); cloudList(); };
+// Suoni dal cloud: elenco in cloud.json accanto all'app (se manca c'e' solo il preset iniziale); ogni voce e' un file preset
+const WEBCAT = [{name: 'Pathfinder Start', file: 'preset.json'}];
+async function listWeb(){
+  const box = $('wl'), msg = $('wmsg'); box.textContent = ''; msg.textContent = 'Cerco i suoni disponibili\u2026';
+  let cat = null;
+  try{ const r = await fetch('cloud.json', {cache: 'no-cache'}); if(r.ok){ const j = await r.json(); if(Array.isArray(j)) cat = j.filter(x => x && typeof x.name === 'string' && typeof x.file === 'string' && /^[\w.\- ]{1,60}\.json$/.test(x.file)); } }catch(e){}
+  if(!cat || !cat.length) cat = WEBCAT;
+  msg.textContent = 'Caricare sostituisce i suoni di tutti i pad. Serve la connessione.';
+  cat.forEach(c => {
+    const row = document.createElement('div'), nm = document.createElement('b'), bt = document.createElement('button');
+    row.className = 'pi'; nm.textContent = String(c.name).slice(0, 40); bt.className = 'o fit'; bt.textContent = 'Carica';
+    bt.onclick = () => twice(bt, 'Carica', async () => {
+      bt.disabled = true; msg.textContent = 'Scarico \u00ab' + nm.textContent + '\u00bb\u2026';
+      try{
+        const r = await fetch(encodeURI(c.file), {cache: 'no-cache'}); if(!r.ok) throw 0;
+        const o = JSON.parse(await r.text()); if(o.app !== 'drumpad' || !Array.isArray(o.pads)) throw 0;
+        await loadPreset(buildRec(o, nm.textContent)); curPre = null; saveMeta(); renderCur();
+        msg.textContent = '\u00ab' + nm.textContent + '\u00bb caricato su tutti i pad.';
+      }catch(e){ msg.textContent = 'Non riesco a scaricare questi suoni: controlla la connessione e riprova.'; }
+      bt.disabled = false;
+    });
+    row.append(nm, bt); box.append(row);
+  });
+}
+$('bPre').onclick = () => { listWeb(); for(let i = 0; i < N; i++) if(ed < 0) stopV(i); $('pr').hidden = false; pmsg('Caricare un preset sostituisce i suoni di tutti i pad.'); renderCur(); listPresets(); cmsg(''); cloudList(); };
 $('pSave').onclick = savePreset;
 $('pUpd').onclick = updatePreset;
 $('pn').addEventListener('keydown', e => { if(e.key === 'Enter') savePreset(); });
