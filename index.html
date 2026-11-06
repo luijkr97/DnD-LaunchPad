@@ -173,11 +173,64 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
 #pl{display:flex;flex-direction:column;gap:8px;max-height:40vh;overflow:auto;font-size:14px}
 .pi{display:flex;align-items:center;gap:8px}
 .pi b{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ===== Scocca (2.01 prova) ===== */
+#case{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;padding:14px;border-radius:26px;position:relative;
+ --cc:#2b2d31;--ci:#ecebe6;--cm:#9a9ca4;--bg:var(--cc);--ink:var(--ci);--mute:var(--cm);--edge:rgba(255,255,255,.22);--sh:rgba(0,0,0,.45);
+ background-color:var(--cc);color:var(--ci);
+ box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 -2px 0 rgba(0,0,0,.25) inset,0 14px 30px var(--sh),0 2px 6px rgba(0,0,0,.3)}
+#case[data-mat="matte"]{background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1.2px),linear-gradient(160deg,rgba(255,255,255,.07),rgba(0,0,0,.12));background-size:3px 3px,auto}
+#case[data-mat="metal"]{background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.07) 0 1px,rgba(0,0,0,.05) 1px 2px,transparent 2px 4px),linear-gradient(115deg,rgba(255,255,255,.28),rgba(255,255,255,0) 35%,rgba(0,0,0,.16) 60%,rgba(255,255,255,.14))}
+#case[data-mat="carbon"]{background-image:linear-gradient(45deg,rgba(0,0,0,.35) 25%,transparent 25% 75%,rgba(0,0,0,.35) 75%),linear-gradient(45deg,rgba(0,0,0,.35) 25%,transparent 25% 75%,rgba(0,0,0,.35) 75%),linear-gradient(160deg,rgba(255,255,255,.12),rgba(0,0,0,.2));background-size:8px 8px,8px 8px,auto;background-position:0 0,4px 4px,0 0}
+#case[data-mat="wood"]{background-image:repeating-linear-gradient(92deg,rgba(0,0,0,.10) 0 2px,transparent 2px 9px,rgba(255,255,255,.06) 9px 11px,transparent 11px 17px),repeating-linear-gradient(88deg,rgba(0,0,0,.07) 0 1px,transparent 1px 23px),linear-gradient(180deg,rgba(255,255,255,.08),rgba(0,0,0,.15))}
+#case[data-mat="gloss"]{background-image:linear-gradient(165deg,rgba(255,255,255,.38) 0,rgba(255,255,255,.08) 38%,rgba(0,0,0,.0) 39%,rgba(0,0,0,.18) 100%)}
+#case h1{font-size:18px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;text-shadow:0 1px 0 rgba(255,255,255,.25)}
+#case button.o,#case .seg{background:rgba(0,0,0,.14);box-shadow:0 1px 0 rgba(255,255,255,.2),0 -1px 0 rgba(0,0,0,.25) inset;border-color:var(--edge)}
+#case .seg button[aria-pressed="true"],#case button.o[aria-pressed="true"]{background:var(--ci);color:var(--cc);border-color:var(--ci)}
+#case #grid{padding:10px;border-radius:16px;background:rgba(0,0,0,.42);box-shadow:inset 0 3px 8px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.25);gap:9px}
+#case .pad{--ink:#ecebe6;--mute:#8e919a;border:2px solid transparent;border-radius:12px;background:linear-gradient(150deg,#383b42,#1f2125);
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 0 rgba(0,0,0,.55),0 5px 9px rgba(0,0,0,.35);font-size:12px;letter-spacing:.02em}
+#case .pad::before{width:6px;height:6px;top:8px;left:8px;box-shadow:0 0 6px var(--c);opacity:.9}
+#case .m-edit .pad,#case .m-fx .pad,#case .m-vol .pad{border-color:rgba(255,255,255,.3)}
+#case .pad.hit,#case .pad.on{background:var(--c);border-color:var(--c);transform:translateY(2px);box-shadow:0 0 24px var(--c),inset 0 0 18px rgba(255,255,255,.35)}
+#case .pad.empty::after{opacity:.35}
+#case .pad.img{background:#17181b}
+#case .pad.img::after{content:'';position:absolute;inset:0;z-index:0;background:linear-gradient(to top,rgba(0,0,0,.72),rgba(0,0,0,0) 62%),var(--im) center/cover;filter:grayscale(1) contrast(1.08) brightness(.95)}
+#case[data-ist="duo"] .pad.img::after{background:linear-gradient(to top,rgba(0,0,0,.72),rgba(0,0,0,0) 62%),var(--im) center/cover,var(--tc,var(--c));background-blend-mode:normal,luminosity,normal;filter:contrast(1.05) saturate(.55) brightness(.85)}
+#case[data-ist="orig"] .pad.img::after{filter:none}
+#case .pad.img.hit,#case .pad.img.on{filter:none}
+#case .pad.img.hit::after,#case .pad.img.on::after{filter:brightness(1.3)}
+#case .pad.img.hit,#case .pad.img.on{background:#17181b}
+#case .pad.img span,#case .pad.img i{color:#fff}
+#case #hint{flex:1;min-width:0;padding:6px 10px;border-radius:7px;background:#12161a;color:#9fe3b0;font-family:ui-monospace,Menlo,monospace;font-size:12px;box-shadow:inset 0 2px 5px rgba(0,0,0,.7),0 1px 0 rgba(255,255,255,.2);line-height:1.25}
+#case footer{color:var(--ci)}
+#lookBtn[hidden]{display:none}
+#lk{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;z-index:10}
+#lk[hidden]{display:none}
+.pan{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.pan button{font:inherit;border:0;padding:0;background:#fff;border-radius:6px;overflow:hidden;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.35);text-align:left;color:#222}
+.pan button i{display:block;height:44px}
+.pan button b{display:block;font-size:9.5px;font-weight:600;padding:3px 4px 4px;line-height:1.1;letter-spacing:.02em;text-transform:uppercase}
+.pan button[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:2px}
+.mats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mats button{font:inherit;font-size:12px;font-weight:700;border:2px solid var(--edge);border-radius:10px;padding:0;background:transparent;color:var(--ink);cursor:pointer;overflow:hidden}
+.mats button i{display:block;height:34px;background-color:#8a8d94}
+.mats button span{display:block;padding:4px 0}
+.mats button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.mats [data-m="matte"] i{background-image:radial-gradient(rgba(255,255,255,.25) 1px,transparent 1.2px);background-size:3px 3px}
+.mats [data-m="metal"] i{background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 1px,rgba(0,0,0,.1) 1px 2px,transparent 2px 4px)}
+.mats [data-m="carbon"] i{background-color:#2b2d31;background-image:linear-gradient(45deg,rgba(0,0,0,.6) 25%,transparent 25% 75%,rgba(0,0,0,.6) 75%),linear-gradient(45deg,rgba(0,0,0,.6) 25%,transparent 25% 75%,rgba(0,0,0,.6) 75%);background-size:8px 8px;background-position:0 0,4px 4px}
+.mats [data-m="wood"] i{background-color:#a9763f;background-image:repeating-linear-gradient(92deg,rgba(0,0,0,.2) 0 2px,transparent 2px 9px)}
+.mats [data-m="gloss"] i{background-image:linear-gradient(165deg,rgba(255,255,255,.7) 0,rgba(255,255,255,.1) 40%,rgba(0,0,0,.25) 100%)}
+.lkh{margin:0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+@media (max-width:520px){body{padding:8px!important}#case{padding:10px;border-radius:22px}}
 </style></head>
 <body>
+<div id="case" data-mat="matte" data-ist="mono">
 <header>
   <div class="hl"><button class="o fxb" id="fxm" aria-pressed="false" aria-label="Effetti">FX</button><button class="o fxb fdb" id="fdm" aria-pressed="false" aria-label="Volume dei pad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 4v16M12 4v16M18 4v16"/><rect x="3.5" y="13" width="5" height="3.5" rx="1" fill="currentColor"/><rect x="9.5" y="6.5" width="5" height="3.5" rx="1" fill="currentColor"/><rect x="15.5" y="10" width="5" height="3.5" rx="1" fill="currentColor"/></svg></button><h1>Drum Pad</h1></div>
   <div class="hr"><button class="o fxb" id="umd" aria-pressed="false" aria-label="Passa alla modalità User">USER</button><button class="o ic" id="hlp" aria-label="Manuale"><b style="font-size:20px">?</b></button>
+  <button class="o ic" id="lookBtn" aria-label="Personalizzazione: materiale e colori" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.4 0 2-.9 2-1.8 0-1.3-1-1.5-1-2.7 0-1 .8-1.5 1.8-1.5H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.1" fill="currentColor"/><circle cx="10" cy="7" r="1.1" fill="currentColor"/><circle cx="15" cy="7" r="1.1" fill="currentColor"/></svg></button>
   <button class="o ic" id="gear" aria-pressed="false" aria-label="Modifica pad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
 </header>
 <div id="grid"></div>
@@ -196,7 +249,21 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
   <button class="o" id="bPre">Preset</button>
 </div>
 <footer><span id="hint">Carico i suoni…</span><button class="o" id="reset">Ripristina tutto</button></footer>
+</div>
 <input type="file" id="file" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1">
+<div id="lk" hidden><div class="sheet">
+  <div class="edh"><h2 style="text-align:left">Personalizzazione</h2><button class="o pv" id="lkX" aria-label="Chiudi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <p class="lkh">Materiale</p><div class="mats" id="lkM">
+    <button data-m="matte" aria-pressed="true"><i></i><span>Attuale</span></button>
+    <button data-m="metal" aria-pressed="false"><i></i><span>Acciaio</span></button>
+    <button data-m="wood" aria-pressed="false"><i></i><span>Legno</span></button>
+  </div>
+  <p class="lkh">Colore del materiale</p><div class="pan" id="lkC"></div>
+  <p class="lkh">Immagini dei pad</p>
+  <div class="seg" id="lkS"><button data-s="orig" aria-pressed="true">Nessun filtro</button><button data-s="mono" aria-pressed="false">Grigio</button><button data-s="duo" aria-pressed="false">Colore</button></div>
+  <div id="lkTw"><p class="lkh">Colore del filtro</p><div class="pan" id="lkT"></div></div>
+  <p class="note">Le immagini non vengono modificate: cambia solo come le vedi.</p>
+</div></div>
 <div id="ed" hidden><div class="sheet">
   <div class="edh">
     <button class="o pv" id="edPrev" aria-label="Pad precedente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -285,6 +352,7 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
       <tr><td>Spostare un pad</td><td>Tieni premuto e trascina su un altro pad</td><td>Tieni premuto il mouse e trascina</td></tr>
       <tr><td>Cambiare pagina</td><td>Scorri a sinistra o a destra sulla griglia</td><td>Tasti 1 e 2 sotto la griglia</td></tr>
       <tr><td>Cambiare pagina mentre sposti</td><td colspan="2">Tieni il pad sul tasto 1 o 2 per mezzo secondo</td></tr>
+      <tr><td>Personalizzare l'aspetto</td><td colspan="2">Ingranaggio, poi l'icona tavolozza in alto: materiale (attuale, acciaio, legno), colore e filtro delle immagini dei pad</td></tr>
       <tr><td>Modificare un pad</td><td>Ingranaggio, poi tocca il pad</td><td>Tasto destro sul pad</td></tr>
       <tr><td>Effetti (FX)</td><td>Tasto FX, poi tocca il pad</td><td><kbd>Shift</kbd> + tasto destro</td></tr>
       <tr><td>Volume del pad</td><td>Icona fader, poi scorri su o giù sul pad</td><td><kbd>Ctrl</kbd> + tasto destro e scorri su o giù. Tenendo <kbd>Ctrl</kbd> premuto si vedono i volumi in giallo</td></tr>
@@ -399,7 +467,7 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
       </ul>
     </details>
   </div>
-  <p class="note" style="text-align:center;font-size:11px;margin:4px 0 0">Drum Pad · versione 1.55</p>
+  <p class="note" style="text-align:center;font-size:11px;margin:4px 0 0">Drum Pad · versione 2.01</p>
   <button class="o" id="manDone">Chiudi</button>
 </div></div>
 <div id="pk" hidden><div class="sheet">
@@ -1103,9 +1171,45 @@ function setMode(m){
   mode = m;
   $('gear').setAttribute('aria-pressed', m === 'edit'); $('fxm').setAttribute('aria-pressed', m === 'fx'); $('fdm').setAttribute('aria-pressed', m === 'vol');
   grid.className = 'm-' + m + (ctrlDown || m === 'vol' ? ' k-vol' : '');
-  hint(hints[m]);
+  hint(hints[m]); $('lookBtn').hidden = m !== 'edit'; if(m !== 'edit') $('lk').hidden = true;
 }
 $('gear').onclick = () => setMode(mode === 'edit' ? 'play' : 'edit');
+// ===== Personalizzazione =====
+const MAT_C = {
+  matte: [['Grafite','#2b2d31'],['Nero','#141517'],['Avorio','#e4e0d3'],['Argento','#b7bac0'],['Rosso','#c23a2f'],['Arancio','#df7a2a'],['Giallo','#e3bf45'],['Salvia','#7f9d86'],['Blu','#2f5fa8'],['Viola','#6a4aa0']],
+  metal: [['Acciaio','#a9adb3'],['Titanio','#7c8087'],['Canna di fucile','#3d4046'],['Nero satinato','#1c1d20'],['Oro','#c9a24a'],['Rame','#b8704a'],['Blu notte','#3b5575'],['Rosso anodizzato','#a33a35']],
+  wood: [['Betulla','#d9bd8f'],['Rovere','#b78a52'],['Ciliegio','#a0522d'],['Noce','#6b4528'],['Mogano','#6e2f22'],['Ebano','#2a211c']]
+};
+const TINT_C = [['Del pad', 'row'], ['Bianco', '#e8e6df'], ['Rosso', '#d4453a'], ['Arancio', '#e8892f'], ['Giallo', '#e6c34a'], ['Verde', '#5fae6e'], ['Azzurro', '#4aa3d8'], ['Blu', '#3a5fc0'], ['Viola', '#8a5cc0'], ['Rosa', '#e07aa6']];
+let look = {m: 'matte', cols: {matte: '#2b2d31', metal: '#a9adb3', wood: '#b78a52'}, s: 'orig', t: 'row'};
+function lum(h){ const n = parseInt(h.slice(1), 16), f = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(n >> 16) + .7152 * f((n >> 8) & 255) + .0722 * f(n & 255); }
+function swatches(box, list, cur, fn){
+  box.innerHTML = '';
+  list.forEach(([n, h]) => { const b = document.createElement('button'); b.setAttribute('aria-label', n); b.setAttribute('aria-pressed', h === cur);
+    b.innerHTML = '<i style="' + (h === 'row' ? 'background:linear-gradient(90deg,#e0a43a 25%,#d65a8c 25% 50%,#3fb3c8 50% 75%,#8ac43f 75%)' : 'background:' + h) + '"></i><b>' + n + '</b>';
+    b.onclick = () => { fn(h); applyLook(); saveLook(); }; box.appendChild(b); });
+}
+function applyLook(){
+  const c = $('case'), col = look.cols[look.m], light = lum(col) > .3;
+  c.style.setProperty('--cc', col);
+  c.style.setProperty('--ci', light ? '#1d1f23' : '#ecebe6');
+  c.style.setProperty('--cm', light ? '#55575d' : '#9a9ca4');
+  c.style.setProperty('--edge', light ? 'rgba(0,0,0,.28)' : 'rgba(255,255,255,.22)');
+  if(look.t === 'row') c.style.removeProperty('--tc'); else c.style.setProperty('--tc', look.t);
+  c.dataset.mat = look.m; c.dataset.ist = look.s;
+  $('lkM').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.m === look.m));
+  $('lkS').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.s === look.s));
+  $('lkTw').hidden = look.s !== 'duo';
+  swatches($('lkC'), MAT_C[look.m], col, h => { look.cols[look.m] = h; });
+  swatches($('lkT'), TINT_C, look.t, h => { look.t = h; });
+}
+async function saveLook(){ const db = await DB; if(db){ try{ db.transaction('p', 'readwrite').objectStore('p').put(JSON.parse(JSON.stringify(look)), 'look'); }catch(e){} } }
+$('lkM').querySelectorAll('button').forEach(b => b.onclick = () => { look.m = b.dataset.m; applyLook(); saveLook(); });
+$('lkS').querySelectorAll('button').forEach(b => b.onclick = () => { look.s = b.dataset.s; applyLook(); saveLook(); });
+$('lookBtn').onclick = () => { $('lk').hidden = false; };
+$('lkX').onclick = () => { $('lk').hidden = true; };
+$('lk').addEventListener('pointerdown', e => { if(e.target === $('lk')) $('lk').hidden = true; });
+applyLook();
 
 // Modalita' User / Editor e tasti effetto al volo
 function uSet(id, on){
@@ -1142,7 +1246,8 @@ $('umd').onclick = () => setUser(!um);
 document.addEventListener('keydown', e => {
   if(e.target.tagName === 'INPUT' && e.target.type !== 'range') return;
   if(e.key === 'Escape'){
-    if(!$('cs').hidden) closeCs();
+    if(!$('lk').hidden) $('lk').hidden = true;
+    else if(!$('cs').hidden) closeCs();
     else if(!$('man').hidden) $('man').hidden = true;
     else if(!$('pr').hidden) $('pDone').click();
     else if(fxI >= 0) closeFx();
@@ -1785,7 +1890,7 @@ async function cloudLoad(r, btn){
 $('cSave').onclick = cloudSave;
 function closePr(){ $('pr').hidden = true; }
 // Suoni dal cloud: elenco in cloud.json accanto all'app (se manca c'e' solo il preset iniziale); ogni voce e' un file preset
-const WEBCAT = [{name: 'Pathfinder Start', file: 'preset.json'}];
+const WEBCAT = [{name: 'Pathfinder Start x v2', file: 'preset.json'}];
 async function listWeb(){
   const box = $('wl'), msg = $('wmsg'); box.textContent = ''; msg.textContent = 'Cerco i suoni disponibili\u2026';
   let cat = null;
@@ -1932,6 +2037,7 @@ $('pr').addEventListener('pointerdown', e => { if(e.target === $('pr')) closePr(
   }
   if(db){ try{ const mt = await req(db.transaction('p').objectStore('p').get('meta')); try{ const uf = await req(db.transaction('p').objectStore('p').get('ufx')); if(uf && uf.fx) cfg[N].fx = cleanFx(uf.fx); }catch(e){}
   curPre = mt && typeof mt.cur === 'string' ? mt.cur : null; if(mt && Array.isArray(mt.gxf) && mt.gxf.length === 7) mt.gxf.forEach((v, k) => { if(Number.isFinite(v)) gxf[k] = Math.min(3, Math.max(0, v)); }); }catch(e){} }
+  if(db){ try{ const lk = await req(db.transaction('p').objectStore('p').get('look')); if(lk && lk.cols){ const hx = /^#[0-9a-f]{6}$/i; if(['matte','metal','wood'].includes(lk.m)) look.m = lk.m; for(const k of ['matte','metal','wood']) if(hx.test(lk.cols[k] || '')) look.cols[k] = lk.cols[k]; if(['mono','duo','orig'].includes(lk.s)) look.s = lk.s; if(lk.t === 'row' || hx.test(lk.t || '')) look.t = lk.t; applyLook(); } }catch(e){} }
   for(let i = 0; i < N; i++) label(i);
   // primo avvio: se accanto a questo file c'e' preset.json, parte gia' con quei suoni e quelle immagini
   if(db && !found){
