@@ -467,7 +467,7 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
       </ul>
     </details>
   </div>
-  <p class="note" style="text-align:center;font-size:11px;margin:4px 0 0">Drum Pad · versione 2.01</p>
+  <p class="note" style="text-align:center;font-size:11px;margin:4px 0 0">Drum Pad · versione 2.02</p>
   <button class="o" id="manDone">Chiudi</button>
 </div></div>
 <div id="pk" hidden><div class="sheet">
@@ -503,7 +503,7 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
     <p class="note" id="cmsg" aria-live="polite"></p>
   </div>
   <div id="web">
-    <p class="grp">Suoni dal cloud</p>
+    <p class="grp">Preset dal cloud</p>
     <div id="wl"></div>
     <p class="note" id="wmsg" aria-live="polite"></p>
   </div>
@@ -1892,26 +1892,42 @@ function closePr(){ $('pr').hidden = true; }
 // Suoni dal cloud: elenco in cloud.json accanto all'app (se manca c'e' solo il preset iniziale); ogni voce e' un file preset
 const WEBCAT = [{name: 'Pathfinder Start x v2', file: 'preset.json'}];
 async function listWeb(){
-  const box = $('wl'), msg = $('wmsg'); box.textContent = ''; msg.textContent = 'Cerco i suoni disponibili\u2026';
-  let cat = null;
+  const box = $('wl'), msg = $('wmsg'); box.textContent = ''; msg.textContent = 'Cerco i preset disponibili…';
+  let cat = null, rem = null;
   try{ const r = await fetch('cloud.json', {cache: 'no-cache'}); if(r.ok){ const j = await r.json(); if(Array.isArray(j)) cat = j.filter(x => x && typeof x.name === 'string' && typeof x.file === 'string' && /^[\w.\- ]{1,60}\.json$/.test(x.file)); } }catch(e){}
   if(!cat || !cat.length) cat = WEBCAT;
+  const base = (csGet('dp_cloud') || CLOUD_URL || '').replace(/\/+$/, '');
+  if(/^https:\/\//.test(base)){
+    try{ const r = await fetch(base + '/presets.json', {cache: 'no-cache'}); if(r.ok){ const j = await r.json(), a = Array.isArray(j) ? j : j && j.presets;
+      if(Array.isArray(a)) rem = a.filter(x => x && typeof x.name === 'string' && typeof x.file === 'string' && /^[\w.\- ]{1,60}(\/[\w.\- ]{1,60}){0,4}\.json$/.test(x.file) && !/(^|\/)\.\.?(\/|$)/.test(x.file)); } }catch(e){}
+  }
   msg.textContent = 'Caricare sostituisce i suoni di tutti i pad. Serve la connessione.';
-  cat.forEach(c => {
+  const item = (c, url) => {
     const row = document.createElement('div'), nm = document.createElement('b'), bt = document.createElement('button');
     row.className = 'pi'; nm.textContent = String(c.name).slice(0, 40); bt.className = 'o fit'; bt.textContent = 'Carica';
     bt.onclick = () => twice(bt, 'Carica', async () => {
-      bt.disabled = true; msg.textContent = 'Scarico \u00ab' + nm.textContent + '\u00bb\u2026';
+      bt.disabled = true; msg.textContent = 'Scarico «' + nm.textContent + '»…';
       try{
-        const r = await fetch(encodeURI(c.file), {cache: 'no-cache'}); if(!r.ok) throw 0;
+        const r = await fetch(url, {cache: 'no-cache'}); if(!r.ok) throw 0;
         const o = JSON.parse(await r.text()); if(o.app !== 'drumpad' || !Array.isArray(o.pads)) throw 0;
         await loadPreset(buildRec(o, nm.textContent)); curPre = null; saveMeta(); renderCur();
-        msg.textContent = '\u00ab' + nm.textContent + '\u00bb caricato su tutti i pad.';
-      }catch(e){ msg.textContent = 'Non riesco a scaricare questi suoni: controlla la connessione e riprova.'; }
+        msg.textContent = '«' + nm.textContent + '» caricato su tutti i pad.';
+      }catch(e){ msg.textContent = 'Non riesco a scaricare questo preset: controlla la connessione e riprova.'; }
       bt.disabled = false;
     });
-    row.append(nm, bt); box.append(row);
-  });
+    row.append(nm, bt); return row;
+  };
+  const head = t => { const h = document.createElement('p'); h.className = 'note'; h.style.cssText = 'font-weight:700;margin:6px 0 0'; h.textContent = t; return h; };
+  if(rem && rem.length){
+    const groups = {};
+    rem.forEach(c => { const k = c.file.includes('/') ? c.file.slice(0, c.file.lastIndexOf('/')).replace(/\//g, ' › ') : ''; (groups[k] = groups[k] || []).push(c); });
+    Object.keys(groups).sort((a, b) => a.localeCompare(b, 'it')).forEach(k => {
+      box.append(head(k || 'Cloud'));
+      groups[k].sort((a, b) => a.name.localeCompare(b.name, 'it')).forEach(c => box.append(item(c, base + '/' + encodeURI(c.file))));
+    });
+    box.append(head('Inclusi nell’app'));
+  }
+  cat.forEach(c => box.append(item(c, encodeURI(c.file))));
 }
 $('bPre').onclick = () => { listWeb(); for(let i = 0; i < N; i++) if(ed < 0) stopV(i); $('pr').hidden = false; pmsg('Caricare un preset sostituisce i suoni di tutti i pad.'); renderCur(); listPresets(); cmsg(''); cloudList(); };
 $('pSave').onclick = savePreset;
