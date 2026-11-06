@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Drum Pad</title>
 <!-- versione 4: 2 pagine, preset, modalità di riproduzione -->
-<!-- build 2.05 -->
+<!-- build 2.14 -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;700&display=swap">
 <style>
 :root{--bg:#e8e5de;--pad:#d3cfc5;--edge:#bdb8ab;--ink:#23252b;--mute:#6b6a64;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
@@ -27,7 +27,7 @@ h1{font-size:22px;margin:0;font-weight:700}
 .pad.empty::after{content:'';position:absolute;left:50%;top:44%;width:38%;max-width:46px;aspect-ratio:1;transform:translate(-50%,-50%);background:var(--mute);opacity:.5;-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'><circle cx='24' cy='24' r='17' stroke-dasharray='4 6'/><path d='M24 16v16M16 24h16'/></svg>") center/contain no-repeat;mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'><circle cx='24' cy='24' r='17' stroke-dasharray='4 6'/><path d='M24 16v16M16 24h16'/></svg>") center/contain no-repeat;pointer-events:none}
 .pad.hit,.pad.on{background:var(--c);border-color:var(--c);color:#16181d;box-shadow:0 0 22px var(--c);transition:none}
 .pad.hit i,.pad.on i,.pad.hit span,.pad.on span{color:#16181d}
-.m-edit .pad,.m-fx .pad,.m-vol .pad{border-style:dashed}
+.m-edit .pad,.m-fx .pad,.m-vol .pad,.m-copy .pad,.m-paste .pad{border-style:dashed}
 .pad span,.pad i,.pad::before{z-index:2}
 .pad span{position:relative}
 .fxl{position:absolute;left:0;right:0;bottom:0;height:0;background:rgba(30,110,255,.3);z-index:1;pointer-events:none;display:none}
@@ -192,7 +192,7 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
 #case .pad{--ink:#ecebe6;--mute:#8e919a;border:2px solid transparent;border-radius:12px;background:linear-gradient(150deg,#383b42,#1f2125);
  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 0 rgba(0,0,0,.55),0 5px 9px rgba(0,0,0,.35);font-size:12px;letter-spacing:.02em}
 #case .pad::before{width:6px;height:6px;top:8px;left:8px;box-shadow:0 0 6px var(--c);opacity:.9}
-#case .m-edit .pad,#case .m-fx .pad,#case .m-vol .pad{border-color:rgba(255,255,255,.3)}
+#case .m-edit .pad,#case .m-fx .pad,#case .m-vol .pad,#case .m-copy .pad,#case .m-paste .pad{border-color:rgba(255,255,255,.3)}
 #case .pad.hit,#case .pad.on{background:var(--c);border-color:var(--c);transform:translateY(2px);box-shadow:0 0 24px var(--c),inset 0 0 18px rgba(255,255,255,.35)}
 #case .pad.empty::after{opacity:.35}
 #case .pad.img{background:#17181b}
@@ -203,9 +203,37 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
 #case .pad.img.hit::after,#case .pad.img.on::after{filter:brightness(1.3)}
 #case .pad.img.hit,#case .pad.img.on{background:#17181b}
 #case .pad.img span,#case .pad.img i{color:#fff}
-#case #hint{flex:1;min-width:0;padding:6px 10px;border-radius:7px;background:#12161a;color:#9fe3b0;font-family:ui-monospace,Menlo,monospace;font-size:12px;box-shadow:inset 0 2px 5px rgba(0,0,0,.7),0 1px 0 rgba(255,255,255,.2);line-height:1.25}
+#case #hintW{flex:1;min-width:0;position:relative;padding:6px 14px;border-radius:7px;background:#12161a;color:#9fe3b0;font-family:ui-monospace,Menlo,monospace;box-shadow:inset 0 2px 5px rgba(0,0,0,.7),0 1px 0 rgba(255,255,255,.2);touch-action:none;cursor:pointer;box-sizing:border-box;height:calc(3 * 1.25 * 11.5px + 12px)}
+#case #hintW::before,#case #hintW::after{position:absolute;top:50%;transform:translateY(-52%);font-size:15px;line-height:1;opacity:.35;pointer-events:none}
+#case #hintW::before{content:'‹';left:3px}
+#case #hintW::after{content:'›';right:3px}
 #case footer{color:var(--ci)}
 #lookBtn[hidden]{display:none}
+#case #hint{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;font-size:11.5px;line-height:1.25;max-height:calc(3 * 1.25em);word-break:break-word}
+@media (max-width:359px){#case footer{flex-wrap:wrap}#case #hintW{flex-basis:100%}}
+
+.ub svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ub:not(.dice) b{font-size:10.5px;font-weight:700;line-height:1;margin-top:3px;letter-spacing:.06em;text-transform:uppercase}
+.um .ub:not(.dice) b{display:none}
+.um .ub svg{width:28px;height:28px}
+#ufxL{margin:-6px 0 -6px;font-size:10px;font-weight:700;letter-spacing:.18em;color:var(--mute);line-height:1;text-transform:uppercase}
+.um #ufxL{display:none}
+
+#cpRow{display:flex;gap:6px}
+.cpb{flex:none;height:auto;padding:6px 10px;font-size:13px}
+.cpb[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.cpb:disabled{opacity:.4}
+.um #cpRow{display:none}
+
+#pp{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;z-index:11}
+#pp[hidden]{display:none}
+.ck{display:flex;flex-direction:row;text-align:left;justify-content:flex-start;align-items:center;gap:12px;padding:7px 4px;font-weight:600;cursor:pointer}
+.sheet label.ck{flex-direction:row;font-size:15px}
+.ck input{width:22px;height:22px;accent-color:var(--ink);flex:none;margin:0}
+.ck.all{border-bottom:2px solid var(--edge);padding-bottom:10px;margin-bottom:2px}
+#ppL{overflow:auto;display:flex;flex-direction:column}
+.pv.rep svg{width:20px;height:20px}
+
 #csUr[hidden],#csNav[hidden]{display:none}
 #lk{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;z-index:10}
 #lk[hidden]{display:none}
@@ -236,11 +264,12 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
   <button class="o ic" id="gear" aria-pressed="false" aria-label="Modifica pad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
 </header>
 <div id="grid"></div>
+<div id="ufxL">Fast FX</div>
 <div id="ufx" role="group" aria-label="Effetti al volo">
-  <button class="o ub" data-k="0" aria-pressed="false" aria-label="Compressore"><b>C</b><small>7</small></button>
-  <button class="o ub" data-k="1" aria-pressed="false" aria-label="Riverbero"><b>R</b><small>8</small></button>
-  <button class="o ub" data-k="2" aria-pressed="false" aria-label="Delay"><b>D</b><small>9</small></button>
-  <button class="o ub" data-k="3" aria-pressed="false" aria-label="Overdrive"><b>O</b><small>0</small></button>
+  <button class="o ub" data-k="0" aria-pressed="false" aria-label="Compressore"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16M4 20h16M12 7v3M10 8.5l2 2 2-2M12 17v-3M10 15.5l2-2 2 2M8 12h8"/></svg><b>Comp</b><small>7</small></button>
+  <button class="o ub" data-k="1" aria-pressed="false" aria-label="Riverbero"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.6" fill="currentColor" stroke="none"/><path d="M9.5 8.5a5 5 0 0 1 0 7M13 5.5a9.5 9.5 0 0 1 0 13M16.5 3a14 14 0 0 1 0 18"/></svg><b>Reverb</b><small>8</small></button>
+  <button class="o ub" data-k="2" aria-pressed="false" aria-label="Delay"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14M10 7.5v9M15 10v4M20 11.5v1"/></svg><b>Delay</b><small>9</small></button>
+  <button class="o ub" data-k="3" aria-pressed="false" aria-label="Overdrive"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12Q4 6 6 6H9Q11 6 12 12Q13 18 15 18H18Q20 18 22 12"/></svg><b>Drive</b><small>0</small></button>
   <button class="o ub dice" id="uDice" aria-pressed="false" aria-label="Random sugli effetti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/></svg></button>
 </div>
 <div class="bar">
@@ -248,9 +277,10 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
     <button id="pg0" aria-pressed="true" aria-label="Pagina 1">1</button>
     <button id="pg1" aria-pressed="false" aria-label="Pagina 2">2</button>
   </div>
+  <div id="cpRow" role="group" aria-label="Copia e incolla"><button class="o cpb" id="cpC" aria-pressed="false">Copia</button><button class="o cpb" id="cpP" aria-pressed="false" disabled>Incolla</button></div>
   <button class="o" id="bPre">Preset</button>
 </div>
-<footer><span id="hint">Carico i suoni…</span><button class="o" id="reset">Ripristina tutto</button></footer>
+<footer><div id="hintW" aria-label="Suggerimenti: scorri o tocca i bordi per altri"><span id="hint">Carico i suoni…</span></div><button class="o" id="reset">Ripristina tutto</button></footer>
 </div>
 <input type="file" id="file" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1">
 <div id="lk" hidden><div class="sheet">
@@ -274,6 +304,8 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
   </div>
   <input type="text" id="nm" style="flex:none" maxlength="30" placeholder="Nome del pad" aria-label="Nome del pad">
   <div class="row"><button class="o" id="chSnd">Cambia suono</button></div>
+  <div class="row"><button class="o" id="cpCopy">Copia pad</button><button class="o" id="cpPaste" disabled>Incolla…</button></div>
+  <p class="note" id="cpNote"></p>
   <div class="row"><button class="o" id="imgPick">Scegli immagine</button><button class="o" id="imgDel" hidden>Rimuovi immagine</button></div>
   <input type="file" id="imgFile" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1">
   <div class="wfw">
@@ -292,10 +324,12 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
   <div class="seg w"><button id="bOne">One shot</button><button id="bLoop">Loop</button></div>
   <p class="note" id="lhint"></p>
   <div id="rrBox">
-    <p class="grp">Round robin</p>
+    <p class="grp">Suoni del pad</p>
     <div id="rrList"></div>
+    <input type="file" id="rFile" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1">
     <div class="row"><button class="o" id="rrAdd">Aggiungi suoni</button></div>
     <p class="note" id="rrHint"></p>
+    <p class="note" id="rrRep">L’icona con le frecce sostituisce il suono e mantiene taglio, effetti e tutte le impostazioni.</p>
     <input type="file" id="vFile" multiple style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1">
   </div>
   <div class="seg w"><button id="bFree">Libero</button><button id="bCut">Stop</button><button id="bHold">On/Off</button></div>
@@ -330,6 +364,12 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
   <button class="o" id="bClear">Svuota</button>
   <p class="note">Svuota toglie suono, immagine, varianti ed effetti da questo pad. Si tocca due volte per confermare.</p>
 </div></div>
+<div id="pp" hidden><div class="sheet">
+  <div class="edh"><h2 id="ppT" style="text-align:left">Incolla</h2><button class="o pv" id="ppX" aria-label="Chiudi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <p class="note" id="ppN"></p>
+  <div id="ppL"></div>
+  <div class="row"><button class="o" id="ppGo">Incolla</button><button class="o" id="ppNo">Annulla</button></div>
+</div></div>
 <div id="fx" hidden><div class="sheet">
   <div class="edh">
     <button class="o pv" id="fxL" aria-label="Pad precedente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -355,17 +395,20 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
       <tr><td>Cambiare pagina</td><td>Scorri a sinistra o a destra sulla griglia</td><td>Tasti 1 e 2 sotto la griglia</td></tr>
       <tr><td>Cambiare pagina mentre sposti</td><td colspan="2">Tieni il pad sul tasto 1 o 2 per mezzo secondo</td></tr>
       <tr><td>Personalizzare l'aspetto</td><td colspan="2">Ingranaggio, poi l'icona tavolozza in alto: materiale (attuale, acciaio, legno), colore e filtro delle immagini dei pad</td></tr>
+      <tr><td>Sostituire un suono tenendo le impostazioni</td><td colspan="2">Editor, icona con le frecce accanto al suono nell'elenco Suoni del pad</td></tr>
+      <tr><td>Copiare e incollare le impostazioni</td><td colspan="2">In modalità Editor, tocca Copia (tra le pagine e Preset) e poi il pad da cui copiare; poi tocca il pad su cui incollare e togli la spunta a quello che non vuoi cambiare (taglio, intonazione, preamp, volume, modo, singoli effetti). Esc o un nuovo tocco su Copia / Incolla per uscire. Si può anche dall'editor del pad</td></tr>
+      <tr><td>Scorciatoie in modalità Edit (PC)</td><td colspan="2">Con ingranaggio, FX o fader attivi: <kbd>C</kbd> Copia, <kbd>V</kbd> Incolla. Nell'editor: <kbd>Spazio</kbd> Anteprima, <kbd>L</kbd> Loop / One shot, <kbd>←</kbd> <kbd>→</kbd> pad precedente o successivo</td></tr>
       <tr><td>Modificare un pad</td><td>Ingranaggio, poi tocca il pad</td><td>Tasto destro sul pad</td></tr>
       <tr><td>Effetti (FX)</td><td>Tasto FX, poi tocca il pad</td><td><kbd>Shift</kbd> + tasto destro</td></tr>
       <tr><td>Volume del pad</td><td>Icona fader, poi scorri su o giù sul pad</td><td><kbd>Ctrl</kbd> + tasto destro e scorri su o giù. Tenendo <kbd>Ctrl</kbd> premuto si vedono i volumi in giallo</td></tr>
       <tr><td>Master FX del pad</td><td>Tasto FX, poi scorri su o giù sul pad</td><td>Tasto FX, poi trascina su o giù</td></tr>
       <tr><td>Pad precedente o successivo (editor e FX)</td><td>Frecce ai lati del titolo</td><td>Frecce, oppure tasti <kbd>&larr;</kbd> <kbd>&rarr;</kbd> nell'editor</td></tr>
       <tr><td>Passare a User / Editor</td><td colspan="2">Tasto USER / EDIT in alto a destra</td></tr>
-      <tr><td>Effetto al volo (User)</td><td>Tieni premuto C, R, D o O con un dito e suona il pad con l'altro</td><td>Tieni premuti i tasti <kbd>7</kbd> <kbd>8</kbd> <kbd>9</kbd> <kbd>0</kbd> (C R D O) e suona il pad</td></tr>
+      <tr><td>Effetto al volo (User)</td><td>Tieni premuta un'icona Fast FX (Comp, Reverb, Delay, Drive) con un dito e suona il pad con l'altro</td><td>Tieni premuti i tasti <kbd>7</kbd> <kbd>8</kbd> <kbd>9</kbd> <kbd>0</kbd> (Comp, Reverb, Delay, Drive) e suona il pad</td></tr>
       <tr><td>Tornare alla pagina principale</td><td>Tasto Fine</td><td><kbd>Esc</kbd> chiude editor, FX, preset, manuale e le modalità</td></tr>
       <tr><td>Primo avvio</td><td colspan="2">Se accanto all'app c'è il file preset.json, i pad partono già con i suoni e le immagini lì dentro. Per ricominciare da zero usa Svuota su ogni pad, oppure Ripristina tutto.</td></tr>
-      <tr><td>Un suono dal cloud su un pad</td><td colspan="2">Tocca un pad vuoto, Scegli dal cloud, incolla l'indirizzo del cloud la prima volta, poi apri le cartelle (o cerca per nome), ▶ per ascoltare e Usa per caricare</td></tr>
-      <tr><td>Suoni dal cloud</td><td colspan="2">Preset, sezione Suoni dal cloud: scegli un set e tocca Carica due volte. Sostituisce i pad con quei suoni, da qualsiasi dispositivo.</td></tr>
+      <tr><td>Un suono dal cloud su un pad</td><td colspan="2">Tocca un pad vuoto, Scegli dal cloud, apri le cartelle (o cerca per nome), ▶ per ascoltare e Usa per caricare. Per usare un altro cloud: i tre puntini in alto a destra, poi Modifica URL</td></tr>
+      <tr><td>Preset dal cloud</td><td colspan="2">Preset, sezione Preset dal cloud: scegli un preset (sono raggruppati per cartella) e tocca Carica due volte. Sostituisce tutti i pad con quei suoni, da qualsiasi dispositivo.</td></tr>
       <tr><td>Preset</td><td colspan="2">Tasto Preset in basso a destra</td></tr>
       <tr><td>Svuotare un pad</td><td colspan="2">Editor, Svuota in fondo (tocca due volte)</td></tr>
     </table>
@@ -403,16 +446,17 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
         <li><b>Fade in e out:</b> trascina i quadratini in alto sulla forma d'onda. La diagonale mostra la dissolvenza. Ogni fade arriva al massimo a metà della parte tagliata.</li>
         <li><b>Preamp:</b> sotto la forma d'onda, Gain (da -12 a +24 dB), Bass (graves, ±12 dB) e Treble (acuti, ±12 dB). Si sente in tempo reale mentre il pad suona e il Gain si vede subito sulla forma d'onda: le barre diventano rosse dove il suono va in saturazione.</li>
         <li><b>Anteprima:</b> suona il pad con le impostazioni correnti.</li>
-        <li><b>Cambia suono:</b> sostituisce l'audio e tiene modalità, gruppo, volume, random ed effetti.</li>
+        <li><b>Cambia suono:</b> sostituisce l'audio e tiene modalità, gruppo, volume, random ed effetti, ma azzera taglio, fade e intonazione. Per tenere anche quelli usa l'icona con le frecce nell'elenco Suoni del pad.</li>
         <li><b>Frecce:</b> passano al pad pieno precedente o successivo.</li>
         <li><b>Svuota:</b> toglie suono, immagine, varianti, impostazioni ed effetti. Si conferma con un secondo tocco.</li>
       </ul>
     </details>
-    <details><summary>Round robin</summary>
+    <details><summary>Suoni del pad e round robin</summary>
       <ul>
         <li>Disponibile per i pad One shot: con "Aggiungi suoni" puoi aggiungere fino a 12 varianti.</li>
         <li>A ogni tocco suona una variante a caso, mai la stessa due volte di fila.</li>
         <li>Il tasto play accanto a ogni suono lo ascolta.</li>
+        <li><b>Icona con le frecce:</b> sostituisce quel suono con un altro file e mantiene tutte le impostazioni (taglio, fade, intonazione, preamp, effetti). Con un suono molto più lungo o corto il taglio cade in un punto diverso, perché è in percentuale. Sui pad in Loop c'è solo il suono principale.</li>
         <li><b>Trim della variante:</b> ogni variante ha la sua forma d'onda con trim e fade, indipendenti dal suono principale. "Suono intero" li azzera.</li>
       </ul>
     </details>
@@ -426,8 +470,8 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
     <details><summary>Modalità User ed effetti al volo</summary>
       <ul>
         <li><b>User / Editor:</b> il tasto in alto a destra passa da una all'altra. In User si può solo suonare: spariscono ingranaggio, FX, fader e Ripristina, e non si spostano né si modificano i pad.</li>
-        <li><b>Tasti C R D O:</b> Compressore, Riverbero, Delay, Overdrive. In User, tenendone premuto uno mentre suoni un pad, quel pad viene effettato per quel tocco. Puoi tenerne premuti più insieme. Su PC si usano anche i tasti 7 8 9 0.</li>
-        <li><b>Impostare i parametri:</b> in modalità Editor tocca C, R, D o O per aprire i parametri di quell'effetto (con la R random come negli altri FX). Sono indipendenti dagli FX dei singoli pad. Durante il tocco sostituiscono gli FX del pad.</li>
+        <li><b>Fast FX (Comp, Reverb, Delay, Drive):</b> Compressore, Riverbero, Delay, Overdrive. In User, tenendone premuta un'icona mentre suoni un pad, quel pad viene effettato per quel tocco. Puoi tenerne premuti più insieme. Su PC si usano anche i tasti 7 8 9 0. In Editor sotto ogni icona c'è il nome dell'effetto.</li>
+        <li><b>Impostare i parametri:</b> in modalità Editor tocca Comp, Reverb, Delay o Drive per aprire i parametri di quell'effetto (con la R random come negli altri FX). Sono indipendenti dagli FX dei singoli pad. Durante il tocco sostituiscono gli FX del pad.</li>
         <li><b>Dado:</b> in User, con il dado acceso i parametri degli effetti cambiano a caso a ogni tocco (attorno al valore deciso, oppure nell'intervallo R). Quando lo spegni tornano ai valori decisi nell'editor.</li>
         <li><b>Esc:</b> chiude la finestra aperta (editor, FX, preset, manuale) e riporta alla pagina principale; da ingranaggio, FX o fader torna a suonare.</li>
       </ul>
@@ -451,11 +495,26 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
         <li>È lo stesso valore del cursore Volume nell'editor. Il nuovo livello si sente al tocco successivo.</li>
       </ul>
     </details>
+    <details><summary>Copia e incolla</summary>
+      <ul>
+        <li><b>Copia:</b> in modalità Editor tocca Copia (tra le pagine e Preset) e poi il pad da cui copiare. Si copiano le impostazioni e non il suono: taglio e fade, intonazione e random, preamp, volume, loop e modo, crossfade, master FX ed effetti.</li>
+        <li><b>Incolla:</b> tocca il pad di destinazione e scegli con le spunte cosa incollare (Tutto per incollare tutto), poi conferma. Resti in modalità incolla per altri pad: per uscire tocca di nuovo Copia o Incolla, oppure premi Esc.</li>
+        <li>Si può fare anche dall'editor del pad, con Copia pad e Incolla.</li>
+        <li>Non si incolla su un pad vuoto e le varianti round robin non vengono copiate.</li>
+      </ul>
+    </details>
+    <details><summary>Aspetto e suggerimenti</summary>
+      <ul>
+        <li><b>Personalizzazione:</b> con l'ingranaggio acceso compare l'icona tavolozza. Scegli il materiale (Attuale, Acciaio, Legno), il colore del materiale e il filtro delle immagini dei pad: nessun filtro, grigio o un colore a scelta. Le immagini non vengono modificate e la scelta resta salvata nel dispositivo.</li>
+        <li><b>Display dei suggerimenti:</b> in basso, accanto a Ripristina tutto. Cambia quando passi con il mouse su un pulsante o un pad, o quando tieni premuto un pulsante dal telefono. Scorri a destra o a sinistra sul display, o tocca i bordi, per leggere altri suggerimenti e scorciatoie. Un tocco al centro torna al suggerimento della modalità.</li>
+      </ul>
+    </details>
     <details><summary>Preset e cloud</summary>
       <ul>
         <li><b>Salva nuovo:</b> salva tutti i pad con un nome. <b>Aggiorna:</b> sovrascrive il preset corrente. <b>Carica:</b> sostituisce i suoni di tutti i pad.</li>
         <li><b>Esporta e Importa file:</b> sposta un preset tra dispositivi come file. Su telefono, dopo l'esportazione si apre il menu di condivisione: scegli Drive e la cartella. Per ricaricarlo usa Importa file e scegli il file da Drive. L'esportazione di tutto il setup taglia e comprime i suoni per risparmiare spazio.</li>
-        <li><b>Cloud dell'app:</b> salva e carica i preset online, con i suoni compressi in MP3 e tagliati sulla parte usata. Limite di 20 MB per preset. Vale per chi può modificare l'app.</li>
+        <li><b>Preset dal cloud:</b> l'elenco dei preset online, raggruppati per cartella. Carica sostituisce i suoni di tutti i pad.</li>
+        <li><b>Cloud dell'app:</b> salva e carica i preset online, con i suoni compressi in MP3 e tagliati sulla parte usata. Limite di 20 MB per preset. Compare solo quando l'app è aperta dentro Claude.</li>
         <li><b>Lista Preset:</b> apre la cartella Google Drive dei preset.</li>
         <li>Dopo la compressione il taglio non si può più allungare.</li>
       </ul>
@@ -469,7 +528,7 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
       </ul>
     </details>
   </div>
-  <p class="note" style="text-align:center;font-size:11px;margin:4px 0 0">Drum Pad · versione 2.05</p>
+  <p class="note" style="text-align:center;font-size:11px;margin:4px 0 0">Drum Pad · versione 2.14</p>
   <button class="o" id="manDone">Chiudi</button>
 </div></div>
 <div id="pk" hidden><div class="sheet">
@@ -655,7 +714,7 @@ for(let q = 0; q < 2; q++){
       b.style.setProperty('--c', colors[r]);
       b.innerHTML = '<i></i><span></span><div class="fxl"></div><div class="vl"></div>';
       b.addEventListener('pointerdown', e => { if(e.button === 2){ if(e.ctrlKey && !um) fxSwipe(e, i, 'vol'); return; } e.preventDefault(); if(mode === 'play') play(i); if(mode === 'fx') fxSwipe(e, i); else if(mode === 'vol') fxSwipe(e, i, 'vol'); else if(!um) startDrag(e, i); });
-      b.addEventListener('click', () => { if(um || Date.now() < noClick) return; if(!bufs[i]) openPk(i); else if(mode === 'edit') openEd(i); else if(mode === 'fx') openFx(i); });
+      b.addEventListener('click', () => { if(um || Date.now() < noClick) return; if(mode === 'copy' || mode === 'paste'){ cpTap(i); return; } if(!bufs[i]) openPk(i); else if(mode === 'edit') openEd(i); else if(mode === 'fx') openFx(i); });
       b.addEventListener('contextmenu', e => { e.preventDefault(); if(um || ed >= 0 || fxI >= 0 || Date.now() < noClick || e.ctrlKey) return; if(e.shiftKey){ if(bufs[i]) openFx(i); else hint('Questo pad \u00e8 vuoto: trascina un file audio qui, oppure toccalo per caricarlo.'); } else if(bufs[i]) openEd(i); else hint('Questo pad \u00e8 vuoto: trascina un file audio qui, oppure toccalo per caricarlo.'); });
       b.addEventListener('dragover', e => { if(e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')){ e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; b.classList.add('drop'); } });
       b.addEventListener('dragleave', () => b.classList.remove('drop'));
@@ -998,7 +1057,7 @@ function openEd(i){
   $('nm').value = names[i] || '';
   syncImg();
   $('edT').textContent = 'Pad ' + (i + 1) + ': ' + nm(i);
-  $('ed').hidden = false; sync();
+  cpUi(); $('ed').hidden = false; sync();
 }
 $('bClear').onclick = () => twice($('bClear'), 'Svuota', () => {
   const i = ed; if(i < 0) return;
@@ -1009,7 +1068,7 @@ $('bClear').onclick = () => twice($('bClear'), 'Svuota', () => {
   label(i); put(i);
   hint('Pad ' + (i + 1) + ' svuotato.');
 });
-function closeEd(){ stopV(ed); put(ed); ed = -1; $('ed').hidden = true; }
+function closeEd(){ stopV(ed); put(ed); const i = ed; ed = -1; $('ed').hidden = true; if(i >= 0 && bufs[i]) hint(padSummary(i)); }
 // Frecce: passa al pad pieno precedente o successivo (salta i vuoti, riparte dall'inizio)
 function stepEd(dir){
   if(ed < 0) return;
@@ -1086,19 +1145,19 @@ function trimBox(x){
 function renderRR(){
   if(ed < 0) return;
   const p = cfg[ed], v = vars[ed], box = $('rrList');
-  $('rrBox').hidden = p.loop;
+  $('rrBox').hidden = false; $('rrAdd').hidden = $('rrHint').hidden = p.loop;
   box.textContent = '';
   const m = document.createElement('div'); m.className = 'pi';
   const mb = document.createElement('b'); mb.textContent = '1. ' + nm(ed);
-  m.append(pvBtn(bufs[ed], 1), mb); box.append(m);
-  v.forEach((x, k) => {
+  m.append(pvBtn(bufs[ed], 1), mb, repBtn(-1)); box.append(m);
+  (p.loop ? [] : v).forEach((x, k) => {
     const row = document.createElement('div'); row.className = 'pi';
     const n = document.createElement('b'); n.textContent = (k + 2) + '. ' + x.name;
     const d = document.createElement('button'); d.className = 'o'; d.textContent = 'Togli';
     d.onclick = () => { rrOpen = -1; vars[ed].splice(k, 1); lastV[ed] = undefined; put(ed); label(ed); renderRR(); };
     const tb = document.createElement('button'); tb.className = 'o'; tb.textContent = 'Trim'; tb.setAttribute('aria-expanded', rrOpen === k);
     tb.onclick = () => { rrOpen = rrOpen === k ? -1 : k; renderRR(); };
-    row.append(pvBtn(x.buf, k + 2, () => [x.s ?? 0, x.e ?? 1, x.fi, x.fo]), n, tb, d); box.append(row);
+    row.append(pvBtn(x.buf, k + 2, () => [x.s ?? 0, x.e ?? 1, x.fi, x.fo]), n, repBtn(k), tb, d); box.append(row);
     if(rrOpen === k) box.append(trimBox(x));
   });
   $('rrHint').textContent = v.length
@@ -1169,11 +1228,12 @@ $('nm').addEventListener('keydown', e => { if(e.key === 'Enter') e.target.blur()
 $('ed').addEventListener('pointerdown', e => { if(e.target === $('ed')) closeEd(); });
 
 const hintEl = $('hint');
-function hint(t){ hintEl.textContent = t; }
-const hints = {play: 'Tocca i pad per suonare. Tieni premuto per spostare un pad.', edit: 'Tocca un pad per modificarlo.', fx: 'Tocca un pad per aggiungere effetti.', vol: 'Scorri su e gi\u00f9 su un pad per cambiare il suo volume.'};
+let hintBase = '';
+function hint(t){ clearTimeout(tipT); hintBase = t; hintEl.textContent = t; }
+const hints = {play: 'Tocca i pad per suonare. Tieni premuto per spostare un pad.', edit: 'Tocca un pad per modificarlo.', fx: 'Tocca un pad per aggiungere effetti.', vol: 'Scorri su e gi\u00f9 su un pad per cambiare il suo volume.', copy: 'Tocca il pad di cui copiare le impostazioni.', paste: 'Tocca il pad su cui incollare le impostazioni.'};
 function setMode(m){
   mode = m;
-  $('gear').setAttribute('aria-pressed', m === 'edit'); $('fxm').setAttribute('aria-pressed', m === 'fx'); $('fdm').setAttribute('aria-pressed', m === 'vol');
+  $('gear').setAttribute('aria-pressed', m === 'edit'); $('fxm').setAttribute('aria-pressed', m === 'fx'); $('fdm').setAttribute('aria-pressed', m === 'vol'); $('cpC').setAttribute('aria-pressed', m === 'copy'); $('cpP').setAttribute('aria-pressed', m === 'paste');
   grid.className = 'm-' + m + (ctrlDown || m === 'vol' ? ' k-vol' : '');
   hint(hints[m]); $('lookBtn').hidden = m !== 'edit'; if(m !== 'edit') $('lk').hidden = true;
 }
@@ -1215,6 +1275,209 @@ $('lkX').onclick = () => { $('lk').hidden = true; };
 $('lk').addEventListener('pointerdown', e => { if(e.target === $('lk')) $('lk').hidden = true; });
 applyLook();
 
+// ===== Sostituire un suono mantenendo le impostazioni =====
+let repK = null;
+function repBtn(k){
+  const x = document.createElement('button'); x.className = 'o pv rep'; x.setAttribute('aria-label', 'Sostituisci questo suono');
+  x.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h14l-3.5-3.5M20 16H6l3.5 3.5"/></svg>';
+  x.onclick = () => { repK = k; $('rFile').click(); };
+  return x;
+}
+$('rFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = '';
+  const i = ed, k = repK; repK = null;
+  if(!f || i < 0 || k === null) return;
+  try{
+    const ab = await f.arrayBuffer(), b = await dec(ab.slice(0)), n = f.name.replace(/\.[^.]+$/, '');
+    if(k < 0){
+      stopV(i); bufs[i] = b; raw[i] = ab; names[i] = n; dix[i] = null; lastV[i] = undefined; xfc[i] = undefined;
+      label(i); put(i); closeEd(); openEd(i);
+    }else{
+      const x = vars[i][k]; if(!x) return;
+      x.buf = b; x.raw = ab; x.name = n; lastV[i] = undefined; put(i); label(i); renderRR();
+    }
+    hint('Suono sostituito: le impostazioni sono rimaste.');
+  }catch(err){ $('rrHint').textContent = 'Non riesco a leggere questo file: prova con MP3, WAV, M4A o AIFF.'; }
+});
+
+// ===== Copia e incolla delle impostazioni del pad =====
+let clip = null;
+try{ const s = localStorage.getItem('dp_clip'); if(s){ const o = JSON.parse(s); if(o && o.cfg && Number.isInteger(o.pad)) clip = {pad: o.pad, name: String(o.name || ''), cfg: cleanCfg(o.cfg)}; } }catch(e){}
+const PGROUPS = [
+  {id: 'trim', l: 'Taglio e fade', ks: ['start', 'end', 'fin', 'fout']},
+  {id: 'pitch', l: 'Intonazione e random', ks: ['pitch', 'rndOn', 'rpOn', 'rpLo', 'rpHi']},
+  {id: 'pre', l: 'Preamp (gain, bass, treble)', ks: ['pre']},
+  {id: 'vol', l: 'Volume', ks: ['vol']},
+  {id: 'mode', l: 'Loop, modo di riproduzione e gruppo', ks: ['loop', 'mode', 'group']},
+  {id: 'xf', l: 'Crossfade del loop', ks: ['xf']},
+  {id: 'fxm', l: 'Master FX', ks: ['fxm']}
+];
+function cpUi(){
+  const ok = !!clip;
+  $('cpPaste').disabled = !ok; $('cpP').disabled = !ok;
+  $('cpNote').textContent = ok ? 'Copiate le impostazioni del pad ' + (clip.pad + 1) + (clip.name ? ' «' + clip.name + '»' : '') + '.' : 'Copia le impostazioni di questo pad per incollarle su un altro. Il suono non viene copiato.';
+}
+function setClip(i){
+  clip = {pad: i, name: names[i] || '', cfg: JSON.parse(JSON.stringify(cfg[i]))};
+  try{ localStorage.setItem('dp_clip', JSON.stringify(clip)); }catch(e){}
+  cpUi();
+}
+$('cpCopy').onclick = () => { if(ed < 0) return; setClip(ed); hint('Impostazioni del pad ' + (ed + 1) + ' copiate.'); };
+// Pulsanti COPIA / INCOLLA sotto gli effetti: si toccano e poi si sceglie il pad
+function cpTap(i){
+  if(mode === 'copy'){
+    if(!bufs[i]){ hint('Questo pad \u00e8 vuoto: scegli un pad con un suono.'); return; }
+    setClip(i); setMode('paste'); hint('Copiate le impostazioni del pad ' + (i + 1) + '. Tocca il pad su cui incollare.');
+  }else if(mode === 'paste'){
+    if(!clip) return;
+    if(!bufs[i]){ hint('Questo pad \u00e8 vuoto: prima carica un suono.'); return; }
+    openPaste(i);
+  }
+}
+$('cpC').onclick = () => setMode(mode === 'copy' ? 'play' : 'copy');
+$('cpP').onclick = () => { if(clip) setMode(mode === 'paste' ? 'play' : 'paste'); };
+function ppRow(id, label, all){
+  const l = document.createElement('label'); l.className = 'ck' + (all ? ' all' : '');
+  const c = document.createElement('input'); c.type = 'checkbox'; c.checked = true; c.dataset.id = id;
+  const s = document.createElement('span'); s.textContent = label; l.append(c, s); return l;
+}
+let ppTg = -1;
+function openPaste(i = ed){
+  if(!clip || i < 0) return; ppTg = i;
+  $('ppT').textContent = 'Incolla sul pad ' + (i + 1);
+  $('ppN').textContent = 'Dal pad ' + (clip.pad + 1) + (clip.name ? ' «' + clip.name + '»' : '') + '. Togli la spunta a quello che non vuoi cambiare.';
+  const box = $('ppL'); box.textContent = '';
+  box.append(ppRow('*', 'Tutto', true));
+  PGROUPS.forEach(g => box.append(ppRow(g.id, g.l)));
+  FXD.forEach(e => box.append(ppRow('fx:' + e.id, 'Effetto: ' + e.name)));
+  box.querySelectorAll('input').forEach(c => c.onchange = () => {
+    const all = box.querySelector('input[data-id="*"]'), rest = [...box.querySelectorAll('input')].filter(x => x !== all);
+    if(c === all) rest.forEach(x => x.checked = all.checked); else all.checked = rest.every(x => x.checked);
+  });
+  $('pp').hidden = false;
+}
+function closePaste(){ $('pp').hidden = true; }
+function pasteCfg(i, sel){
+  const t = cfg[i], c = clip.cfg, T = bufs[i].duration, cp = o => JSON.parse(JSON.stringify(o));
+  stopV(i);
+  PGROUPS.forEach(g => { if(sel.has(g.id)) g.ks.forEach(k => { t[k] = cp(c[k]); }); });
+  FXD.forEach(e => { if(sel.has('fx:' + e.id)) t.fx[e.id] = cp(c.fx[e.id]); });
+  const half = (t.end - t.start) * T / 2;
+  t.fin = Math.min(t.fin || 0, half); t.fout = Math.min(t.fout || 0, half); t.xf = Math.min(t.xf || 0, Math.min(5, half));
+  xfc[i] = undefined; lastV[i] = undefined;
+  if(ctx){ try{ applyPre(i, true); }catch(e){} }
+  fxRefresh(i); label(i); put(i);
+}
+$('cpPaste').onclick = () => openPaste(ed);
+$('ppX').onclick = $('ppNo').onclick = closePaste;
+$('pp').addEventListener('pointerdown', e => { if(e.target === $('pp')) closePaste(); });
+$('ppGo').onclick = () => {
+  const sel = new Set([...$('ppL').querySelectorAll('input')].filter(c => c.checked && c.dataset.id !== '*').map(c => c.dataset.id));
+  if(!sel.size){ $('ppN').textContent = 'Scegli almeno una cosa da incollare.'; return; }
+  const i = ppTg; if(i < 0) return; closePaste(); pasteCfg(i, sel); if(ed === i){ closeEd(); openEd(i); }
+  hint('Impostazioni incollate sul pad ' + (i + 1) + '.');
+};
+
+cpUi();
+// ===== Suggerimenti dinamici sul display =====
+let tipT = 0;
+function tip(t){ clearTimeout(tipT); hintEl.textContent = t; }
+function tipEnd(ms){ clearTimeout(tipT); tipT = setTimeout(() => { hintEl.textContent = hintBase; }, ms); }
+const TIPS = {
+  fxm: 'FX: tocca un pad per aprire i suoi effetti.',
+  fdm: 'Volume: scorri su e giù su un pad per cambiarne il volume.',
+  umd: () => um ? 'EDIT: torna alla modifica dei pad.' : 'USER: per suonare, con i Fast FX tenendo premuta un’icona.',
+  hlp: 'Manuale, comandi e versione dell’app.',
+  lookBtn: 'Personalizza materiale, colore e filtro delle immagini.',
+  gear: 'Edit: tocca un pad per modificarlo.',
+  cpC: 'Copia: poi tocca il pad da copiare. In Edit anche il tasto C.',
+  cpP: () => clip ? 'Incolla: tocca il pad di destinazione. In Edit anche il tasto V.' : 'Incolla: prima copia le impostazioni di un pad.',
+  pg0: 'Pagina 1: pad da 1 a 16.',
+  pg1: 'Pagina 2: pad da 17 a 32.',
+  bPre: 'Preset: salva, carica e condividi i suoni, anche dal cloud.',
+  reset: 'Ripristina tutto: torna ai suoni iniziali.',
+  uDice: 'Dado: i parametri degli effetti cambiano a caso a ogni tocco.'
+};
+const UBT = [
+  ['Comp: compressore (tasto 7).'],
+  ['Reverb: riverbero (tasto 8).'],
+  ['Delay: eco (tasto 9).'],
+  ['Drive: overdrive (tasto 0).']
+];
+const FXS = {cmp: 'Comp', rev: 'Reverb', dly: 'Delay', od: 'Drive'};
+function fxOn(i){ return FXD.filter(e => cfg[i].fx[e.id] && cfg[i].fx[e.id].on).map(e => FXS[e.id] || e.name); }
+function padTip(i){
+  const n = 'Pad ' + (i + 1), q = cfg[i], has = !!bufs[i];
+  if(mode === 'copy') return has ? n + ' \u00ab' + nm(i) + '\u00bb: tocca per copiare.' : n + ' vuoto: scegli un pad con un suono.';
+  if(mode === 'paste') return has ? n + ' \u00ab' + nm(i) + '\u00bb: tocca per incollare.' : n + ' vuoto: carica prima un suono.';
+  if(mode === 'edit') return has ? n + ': clic = editor, Maiusc+destro = FX, Ctrl+destro = volume.' : n + ' vuoto: tocca per aggiungere un suono.';
+  if(mode === 'fx') return has ? n + ': ' + (fxOn(i).length ? 'effetti: ' + fxOn(i).join(', ') + '.' : 'nessun effetto attivo.') + ' Master ' + Math.round((q.fxm ?? 1) * 100) + '%.' : n + ' vuoto: nessun effetto.';
+  if(mode === 'vol') return has ? n + ': volume ' + Math.round((q.vol ?? 1) * 100) + '%. Scorri su o gi\u00f9 per cambiarlo.' : n + ' vuoto: nessun volume da regolare.';
+  if(!has) return n + ' vuoto: toccalo per aggiungere un suono.';
+  return n + ' \u00ab' + nm(i) + '\u00bb \u00b7 ' + (q.loop ? 'Loop' : 'One shot') + (q.group ? ' \u00b7 gruppo ' + 'ABCDEF'[q.group - 1] : '') + (vars[i].length && !q.loop ? ' \u00b7 round robin ' + (vars[i].length + 1) : '');
+}
+function padSummary(i){
+  const q = cfg[i], p = [], sg = v => (v > 0 ? '+' : '') + v;
+  p.push(q.loop ? 'Loop' : 'One shot');
+  if(q.group) p.push('gruppo ' + 'ABCDEF'[q.group - 1]);
+  if(q.pitch) p.push(sg(q.pitch) + ' st');
+  if(q.pre && q.pre.g) p.push('gain ' + sg(q.pre.g) + ' dB');
+  if((q.vol ?? 1) < .995) p.push('vol ' + Math.round(q.vol * 100) + '%');
+  if(q.start > .001 || q.end < .999) p.push('tagliato');
+  const f = fxOn(i); if(f.length) p.push(f.join('+'));
+  return 'Pad ' + (i + 1) + ' \u00ab' + nm(i) + '\u00bb: ' + p.join(' \u00b7 ');
+}
+function tipFor(b){
+  if(b.classList.contains('pad')){ const i = els.indexOf(b); return i >= 0 ? padTip(i) : null; }
+  if(b.classList.contains('ub') && b.dataset.k !== undefined){ return UBT[+b.dataset.k][0] + (um ? ' Tieni premuto e suona.' : ' Tocca per i parametri.'); }
+  const t = TIPS[b.id]; return typeof t === 'function' ? t() : (t || null);
+}
+const tipBtn = e => { const b = e.target.closest && e.target.closest('#case button'); return b && $('case').contains(b) ? b : null; };
+document.addEventListener('pointerover', e => {
+  const b = tipBtn(e); if(!b || (b.classList.contains('pad') && e.pointerType !== 'mouse')) return;
+  const t = tipFor(b); if(t) tip(t);
+});
+document.addEventListener('pointerout', e => {
+  const b = tipBtn(e); if(!b || (e.relatedTarget && b.contains(e.relatedTarget))) return;
+  if(b.classList.contains('pad') && e.pointerType !== 'mouse') return;
+  tipEnd(e.pointerType === 'mouse' ? 0 : 2500);
+});
+
+// Scorciatoie da tastiera nelle modalit\u00e0 di modifica e nell'editor
+document.addEventListener('keydown', e => {
+  if(e.target.tagName === 'INPUT' || e.metaKey || e.ctrlKey || e.altKey || e.repeat) return;
+  const k = e.key.toLowerCase();
+  if(ed >= 0){
+    if(!$('pp').hidden || e.target.tagName === 'BUTTON') return;
+    if(k === ' '){ e.preventDefault(); $('bPrev').click(); }
+    else if(k === 'l'){ (cfg[ed].loop ? $('bOne') : $('bLoop')).click(); hint('Pad ' + (ed + 1) + ': ' + (cfg[ed].loop ? 'Loop' : 'One shot') + '.'); }
+    return;
+  }
+  if(um || mode === 'play' || fxI >= 0) return;
+  if(![$('pr'), $('pk'), $('cs'), $('man'), $('lk'), $('pp'), $('fx')].every(x => x.hidden)) return;
+  if(k === 'c'){ e.preventDefault(); $('cpC').click(); }
+  else if(k === 'v' && !$('cpP').disabled){ e.preventDefault(); $('cpP').click(); }
+});
+
+// ===== Suggerimenti a scorrimento: swipe o tocco ai bordi del display =====
+const TIPLIST = ["Shortcut: Z X C V · A S D F · Q W E R · 1 2 3 4 suonano i pad.", "Shortcut: i tasti 7 8 9 0 attivano Comp, Reverb, Delay, Drive.", "Shortcut: tasto destro su un pad apre l’editor.", "Shortcut: Maiusc + destro su un pad apre gli effetti.", "Shortcut: Ctrl + destro e scorri su un pad per il volume.", "Shortcut: Esc chiude finestre e modalità.", "Shortcut: in Edit, C copia e V incolla le impostazioni.", "Shortcut: nell’editor, Spazio = anteprima, L = Loop / One shot.", "Shortcut: nell’editor, ← → passano al pad vicino.", "Shortcut: tieni Ctrl premuto per vedere i volumi dei pad.", "Shortcut: in User tieni premuto 7 8 9 0 mentre suoni.", "Consiglio: tieni premuto un pad per spostarlo.", "Consiglio: porta un pad sul tasto 1 o 2 per cambiare pagina.", "Consiglio: Copia e Incolla clona i settaggi tra pad.", "Consiglio: varianti round robin per un suono più naturale.", "Consiglio: per i loop usa il Crossfade, il giro sarà più fluido.", "Consiglio: in Stop con gruppo, un pad ne zittisce un altro.", "Consiglio: la R negli effetti sceglie un valore a caso.", "Consiglio: il dado in User varia gli effetti a ogni tocco.", "Consiglio: Master FX 0% = suono pulito.", "Consiglio: se il suono satura (barre rosse) abbassa il Gain.", "Consiglio: taglia il silenzio iniziale per pad più reattivi.", "Consiglio: esporta i preset per avere sempre un backup.", "Consiglio: su un pad vuoto puoi registrare con il microfono.", "Consiglio: la tavolozza in Edit cambia look.", "Consiglio: l’icona frecce cambia suono e tiene gli effetti.", "Consiglio: usa On/Off per avviare e fermare un loop con un tocco."];
+for(let k = TIPLIST.length - 1; k > 0; k--){ const j = Math.floor(Math.random() * (k + 1)); [TIPLIST[k], TIPLIST[j]] = [TIPLIST[j], TIPLIST[k]]; }
+let tipI = -1, tipDown = null;
+function tipStep(d){ tipI = tipI < 0 ? 0 : (tipI + d + TIPLIST.length) % TIPLIST.length; hint(TIPLIST[tipI]); }
+function tipReset(){ tipI = -1; hint(um ? 'Modalità User: tieni premuta un’icona Fast FX e suona.' : hints[mode]); }
+{
+  const w = $('hintW');
+  w.addEventListener('pointerdown', e => { tipDown = {x: e.clientX}; });
+  w.addEventListener('pointercancel', () => { tipDown = null; });
+  w.addEventListener('pointerup', e => {
+    if(!tipDown) return;
+    const dx = e.clientX - tipDown.x; tipDown = null;
+    if(Math.abs(dx) > 28){ tipStep(dx < 0 ? 1 : -1); return; }
+    const r = w.getBoundingClientRect(), f = (e.clientX - r.left) / r.width;
+    if(f > .7) tipStep(1); else if(f < .3) tipStep(-1); else tipReset();
+  });
+}
+
 // Modalita' User / Editor e tasti effetto al volo
 function uSet(id, on){
   const k = UIDS.indexOf(id); if(k < 0) return;
@@ -1244,13 +1507,14 @@ function setUser(on){
   else{ uHeld.clear(); document.querySelectorAll('.ub').forEach(b => b.setAttribute('aria-pressed', false)); }
   $('umd').textContent = on ? 'EDIT' : 'USER';
   $('umd').setAttribute('aria-label', on ? 'Passa alla modalit\u00e0 Editor' : 'Passa alla modalit\u00e0 User');
-  hint(on ? 'Modalit\u00e0 User: tieni premuta una lettera (C R D O) mentre suoni un pad per effettarlo.' : 'Modalit\u00e0 Editor. Tocca C, R, D, O per impostare gli effetti al volo.');
+  hint(on ? 'Modalit\u00e0 User: tieni premuta un\u2019icona Fast FX mentre suoni un pad.' : 'Modalit\u00e0 Editor. Tocca le icone Fast FX per impostare gli effetti.');
 }
 $('umd').onclick = () => setUser(!um);
 document.addEventListener('keydown', e => {
   if(e.target.tagName === 'INPUT' && e.target.type !== 'range') return;
   if(e.key === 'Escape'){
-    if(!$('lk').hidden) $('lk').hidden = true;
+    if(!$('pp').hidden) closePaste();
+    else if(!$('lk').hidden) $('lk').hidden = true;
     else if(!$('cs').hidden) closeCs();
     else if(!$('man').hidden) $('man').hidden = true;
     else if(!$('pr').hidden) $('pDone').click();
