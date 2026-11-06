@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Drum Pad</title>
 <!-- versione 4: 2 pagine, preset, modalità di riproduzione -->
-<!-- build 2.04 -->
+<!-- build 2.05 -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;700&display=swap">
 <style>
 :root{--bg:#e8e5de;--pad:#d3cfc5;--edge:#bdb8ab;--ink:#23252b;--mute:#6b6a64;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
@@ -469,7 +469,7 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
       </ul>
     </details>
   </div>
-  <p class="note" style="text-align:center;font-size:11px;margin:4px 0 0">Drum Pad · versione 2.04</p>
+  <p class="note" style="text-align:center;font-size:11px;margin:4px 0 0">Drum Pad · versione 2.05</p>
   <button class="o" id="manDone">Chiudi</button>
 </div></div>
 <div id="pk" hidden><div class="sheet">
@@ -1642,11 +1642,12 @@ function closePk(){ if(rec){ rec.cancel = true; try{ rec.mr.stop(); }catch(e){} 
 $('pkFile').onclick = () => { const i = pkI; closePk(); pick(i); };
 $('pkX').onclick = closePk;
 // Campioni dal cloud: un indirizzo web che contiene samples.json e i file audio (per esempio un bucket R2 pubblico)
-const CLOUD_URL = 'https://pub-4a6b9c223ff24dd488c4742ec7c3c69b.r2.dev';
+const CLOUD_URL = 'https://pub-5019736a88134beb9da25da1d7ad33fb.r2.dev';
 let csI = -1, csLast = '', csCache = new Map(), csPrev = null;
 const csBase = () => $('csU').value.trim().replace(/\/+$/, '');
 const csGet = k => { try{ return localStorage.getItem(k); }catch(e){ return null; } };
 const csSet = (k, v) => { try{ localStorage.setItem(k, v); }catch(e){} };
+if(csGet('dp_cloud') === 'https://pub-4a6b9c223ff24dd488c4742ec7c3c69b.r2.dev') csSet('dp_cloud', CLOUD_URL);
 function openCs(i){
   csI = i; $('csU').value = csGet('dp_cloud') || CLOUD_URL; $('csM').textContent = ''; $('csl').textContent = ''; $('csMenu').hidden = true; $('csDots').setAttribute('aria-expanded', 'false'); $('csUr').hidden = !!csBase();
   $('csT').textContent = 'Suoni dal cloud \u00b7 Pad ' + (i + 1); $('cs').hidden = false;
