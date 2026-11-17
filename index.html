@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Drum Pad</title>
 <!-- versione 4: 2 pagine, preset, modalità di riproduzione -->
-<!-- build 2.16 -->
+<!-- build 2.18 -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;700&display=swap">
 <style>
 :root{--bg:#e8e5de;--pad:#d3cfc5;--edge:#bdb8ab;--ink:#23252b;--mute:#6b6a64;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
@@ -44,11 +44,11 @@ h1{font-size:22px;margin:0;font-weight:700}
 footer{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px;color:var(--mute)}
 button.o{font:inherit;font-size:14px;font-weight:700;color:var(--ink);background:transparent;border:2px solid var(--edge);border-radius:10px;padding:6px 12px;cursor:pointer}
 .pad:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
-#ed,#pr,#fx,#man,#pk,#cs{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end}
-#ed[hidden],#pr[hidden],#fx[hidden],#man[hidden],#pk[hidden],#cs[hidden]{display:none}
+#ed,#pr,#fx,#man,#pk,#cs,#sp{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end}
+#ed[hidden],#pr[hidden],#fx[hidden],#man[hidden],#pk[hidden],#cs[hidden],#sp[hidden]{display:none}
 #csl{display:flex;flex-direction:column;gap:8px;overflow:auto}
 #csl .grp{margin:6px 0 0}
-#ed,#pr,#fx,#man,#pk,#cs{z-index:10}
+#ed,#pr,#fx,#man,#pk,#cs,#sp{z-index:10}
 #pkRec[aria-pressed="true"]{background:#d6402b;border-color:#d6402b;color:#fff}
 #fx,#man{background:var(--bg);align-items:stretch}
 #fx .sheet,#man .sheet{max-height:none;height:100%;border-radius:0;padding-top:calc(16px + env(safe-area-inset-top,0px))}
@@ -64,6 +64,13 @@ button.o{font:inherit;font-size:14px;font-weight:700;color:var(--ink);background
 #rndBox[hidden],#rpBox[hidden]{display:none}
 .hl{display:flex;align-items:center;gap:10px}
 #ufx{display:flex;gap:8px}
+#stopRow{display:flex;justify-content:center;margin-top:-4px}
+#stopAll{display:flex;align-items:center;justify-content:center;gap:8px;height:34px;min-width:46%;padding:0 18px;border-radius:12px}
+#stopAll svg{width:13px;height:13px;fill:currentColor;flex:none}
+#stopAll b{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;line-height:1}
+#stopAll small{font-size:10px;color:var(--mute);line-height:1;font-variant-numeric:tabular-nums}
+#stopAll:active{background:var(--ink);color:var(--bg)}
+#stopAll:active small{color:var(--bg)}
 .ub{flex:1;height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;border-radius:12px;position:relative;touch-action:none}
 .ub b{font-size:20px;line-height:1}
 .ub small{font-size:10px;color:var(--mute);line-height:1;margin-top:2px}
@@ -280,6 +287,7 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
   <button class="o ub" data-k="3" aria-pressed="false" aria-label="Overdrive"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12Q4 6 6 6H9Q11 6 12 12Q13 18 15 18H18Q20 18 22 12"/></svg><b>Drive</b><small>0</small></button>
   <button class="o ub dice" id="uDice" aria-pressed="false" aria-label="Random sugli effetti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/></svg></button>
 </div>
+<div id="stopRow"><button class="o" id="stopAll" aria-label="Stop generale: ferma tutti i suoni"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2.5"/></svg><b>Stop</b><small id="stopF">0.3 s</small></button></div>
 <div class="bar">
   <div class="seg" role="group" aria-label="Pagina">
     <button id="pg0" aria-pressed="true" aria-label="Pagina 1">1</button>
@@ -416,6 +424,7 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
       <tr><td>Master FX del pad</td><td>Tasto FX, poi scorri su o giù sul pad</td><td>Tasto FX, poi trascina su o giù</td></tr>
       <tr><td>Pad precedente o successivo (editor e FX)</td><td>Frecce ai lati del titolo</td><td>Frecce, oppure tasti <kbd>&larr;</kbd> <kbd>&rarr;</kbd> nell'editor</td></tr>
       <tr><td>Passare a User / Editor</td><td colspan="2">Tasto USER / EDIT in alto a destra</td></tr>
+      <tr><td>Stop generale</td><td colspan="2">Il tasto Stop sotto i Fast FX ferma tutti i suoni con un fade out. Per cambiare la durata del fade out (parte da 0,3 s) toccalo in modalità Editor, oppure usa il tasto destro in qualsiasi modalità.</td></tr>
       <tr><td>Effetto al volo (User)</td><td>Tieni premuta un'icona Fast FX (Comp, Reverb, Delay, Drive) con un dito e suona il pad con l'altro</td><td>Tieni premuti i tasti <kbd>7</kbd> <kbd>8</kbd> <kbd>9</kbd> <kbd>0</kbd> (Comp, Reverb, Delay, Drive) e suona il pad</td></tr>
       <tr><td>Tornare alla pagina principale</td><td>Tasto Fine</td><td><kbd>Esc</kbd> chiude editor, FX, preset, manuale e le modalità</td></tr>
       <tr><td>Primo avvio</td><td colspan="2">Se accanto all'app c'è il file preset.json, i pad partono già con i suoni e le immagini lì dentro. Per ricominciare da zero usa Svuota su ogni pad, oppure Ripristina tutto.</td></tr>
@@ -540,8 +549,14 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
       </ul>
     </details>
   </div>
-  <p class="note" style="text-align:center;font-size:11px;margin:4px 0 0">Drum Pad · versione 2.16</p>
+  <p class="note" style="text-align:center;font-size:11px;margin:4px 0 0">Drum Pad · versione 2.18</p>
   <button class="o" id="manDone">Chiudi</button>
+</div></div>
+<div id="sp" hidden><div class="sheet">
+  <h2>Stop generale</h2>
+  <p class="note">Il tasto Stop ferma tutti i suoni con una dissolvenza. Qui scegli quanto dura.</p>
+  <label><span>Fade out <output id="osp"></output></span><input type="range" id="spF" min="0" max="3" step="0.05" value="0.3"></label>
+  <div class="row"><button class="o" id="spDef">Predefinito (0.3 s)</button><button class="o" id="spX">Fine</button></div>
 </div></div>
 <div id="pk" hidden><div class="sheet">
   <h2 id="pkT"></h2>
@@ -760,8 +775,8 @@ function setPage(n){
 // Scorri a destra o a sinistra per cambiare pagina (touch e penna)
 let pgSw = null;
 document.addEventListener('pointerdown', e => {
-  if(e.pointerType === 'mouse' || pgSw || ed >= 0 || fxI >= 0 || !$('pr').hidden || !$('man').hidden) return;
-  if(e.target.closest && e.target.closest('input,textarea,select,a,#ed,#pr,#fx,#man')) return;
+  if(e.pointerType === 'mouse' || pgSw || ed >= 0 || fxI >= 0 || !$('pr').hidden || !$('man').hidden || !$('sp').hidden) return;
+  if(e.target.closest && e.target.closest('input,textarea,select,a,#ed,#pr,#fx,#man,#sp')) return;
   const pd = e.target.closest && e.target.closest('.pad');
   pgSw = {id: e.pointerId, x: e.clientX, y: e.clientY, lock: null, pad: pd ? els.indexOf(pd) : -1};
   const mv = ev => {
@@ -797,10 +812,10 @@ function flash(i){
   setTimeout(() => els[i].classList.remove('hit'), 90);
 }
 const gxf = [.15, .15, .15, .15, .15, .15, .15];  // sfumatura (s) quando un pad ne interrompe un altro, per gruppo (0 = Tutti, 1-6 = A-F)
-function stopV(i, minF){
+function stopV(i, minF, exact){
   const vs = voices[i]; if(!vs.length) return;
   voices[i] = []; els[i].classList.remove('on');
-  const t = ctx.currentTime, f = Math.max(cfg[i].fout, minF || .02);
+  const t = ctx.currentTime, f = exact ? Math.max(.02, minF) : Math.max(cfg[i].fout, minF || .02);
   vs.forEach(v => {
     v.g.gain.cancelScheduledValues(t);
     v.g.gain.setValueAtTime(v.g.gain.value, t);
@@ -1300,7 +1315,7 @@ $('ed').addEventListener('pointerdown', e => { if(e.target === $('ed')) closeEd(
 const hintEl = $('hint');
 let hintBase = '';
 function hint(t){ clearTimeout(tipT); hintBase = t; hintEl.textContent = t; }
-const hints = {play: 'Tocca i pad per suonare. Tieni premuto per spostare un pad.', edit: 'Tocca un pad per modificarlo.', fx: 'Tocca un pad per aggiungere effetti.', vol: 'Scorri su e gi\u00f9 su un pad per cambiare il suo volume.', copy: 'Tocca il pad di cui copiare le impostazioni.', paste: 'Tocca il pad su cui incollare le impostazioni.'};
+const hints = {play: 'Tocca i pad per suonare. Tieni premuto per spostare un pad.', edit: 'Tocca un pad o Stop per modificarli.', fx: 'Tocca un pad per aggiungere effetti.', vol: 'Scorri su e gi\u00f9 su un pad per cambiare il suo volume.', copy: 'Tocca il pad di cui copiare le impostazioni.', paste: 'Tocca il pad su cui incollare le impostazioni.'};
 function setMode(m){
   mode = m;
   $('gear').setAttribute('aria-pressed', m === 'edit'); $('fxm').setAttribute('aria-pressed', m === 'fx'); $('fdm').setAttribute('aria-pressed', m === 'vol'); $('cpC').setAttribute('aria-pressed', m === 'copy'); $('cpP').setAttribute('aria-pressed', m === 'paste');
@@ -1308,6 +1323,27 @@ function setMode(m){
   hint(hints[m]); $('lookBtn').hidden = m !== 'edit'; if(m !== 'edit') $('lk').hidden = true;
 }
 $('gear').onclick = () => setMode(mode === 'edit' ? 'play' : 'edit');
+// Stop generale: ferma tutti i suoni con un fade out; in modalita' Edit il tocco apre le impostazioni del fade out
+let stopFade = .3;
+const stopTxt = () => (+stopFade.toFixed(2)) + ' s';
+function stopAll(){
+  for(let i = 0; i < N; i++) stopV(i, stopFade, true);
+  if(pvSrc){
+    const s = pvSrc, g = pvVg; pvSrc = null; pvVg = null;
+    try{ const t = ctx.currentTime, f = Math.max(.02, stopFade); if(g){ g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + f); } s.stop(t + f + .02); }catch(e){}
+  }
+  csStopPrev();
+}
+function spShow(){ $('stopF').textContent = stopTxt(); $('osp').textContent = stopFade.toFixed(2) + ' s'; $('spF').value = stopFade; }
+const spOpen = () => { spShow(); $('sp').hidden = false; };
+$('stopAll').onclick = () => { if(!um && mode === 'edit') spOpen(); else stopAll(); };
+// tasto destro (o Ctrl + clic su Mac): impostazioni del fade out, come per i pad
+$('stopAll').addEventListener('contextmenu', e => { e.preventDefault(); if(!um) spOpen(); });
+$('spF').oninput = () => { stopFade = +$('spF').value; spShow(); };
+$('spF').onchange = () => saveMeta();
+$('spDef').onclick = () => { stopFade = .3; spShow(); saveMeta(); };
+$('spX').onclick = () => { $('sp').hidden = true; };
+$('sp').addEventListener('pointerdown', e => { if(e.target === $('sp')) $('sp').hidden = true; });
 // ===== Personalizzazione =====
 const MAT_C = {
   matte: [['Grafite','#2b2d31'],['Nero','#141517'],['Avorio','#e4e0d3'],['Argento','#b7bac0'],['Rosso','#c23a2f'],['Arancio','#df7a2a'],['Giallo','#e3bf45'],['Salvia','#7f9d86'],['Blu','#2f5fa8'],['Viola','#6a4aa0']],
@@ -1530,7 +1566,7 @@ document.addEventListener('keydown', e => {
 });
 
 // ===== Suggerimenti a scorrimento: swipe o tocco ai bordi del display =====
-const TIPLIST = ["Shortcut: Z X C V · A S D F · Q W E R · 1 2 3 4 suonano i pad.", "Shortcut: i tasti 7 8 9 0 attivano Comp, Reverb, Delay, Drive.", "Shortcut: tasto destro su un pad apre l’editor.", "Shortcut: Maiusc + destro su un pad apre gli effetti.", "Shortcut: Ctrl + destro e scorri su un pad per il volume.", "Shortcut: Esc chiude finestre e modalità.", "Shortcut: in Edit, C copia e V incolla le impostazioni.", "Shortcut: nell’editor, Spazio = anteprima, L = Loop / One shot.", "Shortcut: nell’editor, ← → passano al pad vicino.", "Shortcut: tieni Ctrl premuto per vedere i volumi dei pad.", "Shortcut: in User tieni premuto 7 8 9 0 mentre suoni.", "Consiglio: tieni premuto un pad per spostarlo.", "Consiglio: porta un pad sul tasto 1 o 2 per cambiare pagina.", "Consiglio: Copia e Incolla clona i settaggi tra pad.", "Consiglio: varianti round robin per un suono più naturale.", "Consiglio: per i loop usa il Crossfade, il giro sarà più fluido.", "Consiglio: in Stop con gruppo, un pad ne zittisce un altro.", "Consiglio: la R negli effetti sceglie un valore a caso.", "Consiglio: il dado in User varia gli effetti a ogni tocco.", "Consiglio: Master FX 0% = suono pulito.", "Consiglio: se il suono satura (barre rosse) abbassa il Gain.", "Consiglio: taglia il silenzio iniziale per pad più reattivi.", "Consiglio: esporta i preset per avere sempre un backup.", "Consiglio: su un pad vuoto puoi registrare con il microfono.", "Consiglio: la tavolozza in Edit cambia look.", "Consiglio: l’icona frecce cambia suono e tiene gli effetti.", "Consiglio: usa On/Off per avviare e fermare un loop con un tocco.", "Consiglio: nell’editor tocca la forma d’onda per ascoltare da lì.", "Consiglio: nell’editor puoi dare a ogni pad un’icona."];
+const TIPLIST = ["Shortcut: Z X C V · A S D F · Q W E R · 1 2 3 4 suonano i pad.", "Shortcut: i tasti 7 8 9 0 attivano Comp, Reverb, Delay, Drive.", "Shortcut: tasto destro su un pad apre l’editor.", "Shortcut: Maiusc + destro su un pad apre gli effetti.", "Shortcut: Ctrl + destro e scorri su un pad per il volume.", "Shortcut: Esc chiude finestre e modalità.", "Shortcut: in Edit, C copia e V incolla le impostazioni.", "Shortcut: nell’editor, Spazio = anteprima, L = Loop / One shot.", "Shortcut: nell’editor, ← → passano al pad vicino.", "Shortcut: tieni Ctrl premuto per vedere i volumi dei pad.", "Shortcut: in User tieni premuto 7 8 9 0 mentre suoni.", "Consiglio: tieni premuto un pad per spostarlo.", "Consiglio: porta un pad sul tasto 1 o 2 per cambiare pagina.", "Consiglio: Copia e Incolla clona i settaggi tra pad.", "Consiglio: varianti round robin per un suono più naturale.", "Consiglio: per i loop usa il Crossfade, il giro sarà più fluido.", "Consiglio: in Stop con gruppo, un pad ne zittisce un altro.", "Consiglio: la R negli effetti sceglie un valore a caso.", "Consiglio: il dado in User varia gli effetti a ogni tocco.", "Consiglio: Master FX 0% = suono pulito.", "Consiglio: se il suono satura (barre rosse) abbassa il Gain.", "Consiglio: taglia il silenzio iniziale per pad più reattivi.", "Consiglio: esporta i preset per avere sempre un backup.", "Consiglio: su un pad vuoto puoi registrare con il microfono.", "Consiglio: la tavolozza in Edit cambia look.", "Consiglio: l’icona frecce cambia suono e tiene gli effetti.", "Consiglio: usa On/Off per avviare e fermare un loop con un tocco.", "Consiglio: nell’editor tocca la forma d’onda per ascoltare da lì.", "Consiglio: nell’editor puoi dare a ogni pad un’icona.", "Consiglio: Stop ferma tutto; in Edit regoli il fade out."];
 for(let k = TIPLIST.length - 1; k > 0; k--){ const j = Math.floor(Math.random() * (k + 1)); [TIPLIST[k], TIPLIST[j]] = [TIPLIST[j], TIPLIST[k]]; }
 let tipI = -1, tipDown = null;
 function tipStep(d){ tipI = tipI < 0 ? 0 : (tipI + d + TIPLIST.length) % TIPLIST.length; hint(TIPLIST[tipI]); }
@@ -1694,7 +1730,7 @@ let curPre = null;
 const snapPads = () => Array.from({length: N}, (_, i) => ({name: names[i] || null, data: raw[i] || null, cfg: cfg[i], img: imgs[i] || null, dx: dix[i] ?? null, vars: vars[i].map(v => ({name: v.name, data: v.raw, s: v.s, e: v.e, fi: v.fi, fo: v.fo}))}));
 async function saveMeta(){
   const db = await DB; if(!db) return;
-  try{ db.transaction('p', 'readwrite').objectStore('p').put({cur: curPre, gxf: gxf.slice()}, 'meta'); }catch(e){}
+  try{ db.transaction('p', 'readwrite').objectStore('p').put({cur: curPre, gxf: gxf.slice(), stopF: stopFade}, 'meta'); }catch(e){}
 }
 function renderCur(){
   $('pcur').textContent = curPre ? 'Preset corrente: «' + curPre + '»' : 'Nessun preset corrente: salva un nuovo preset o caricane uno.';
@@ -2379,7 +2415,7 @@ $('pr').addEventListener('pointerdown', e => { if(e.target === $('pr')) closePr(
     }
   }
   if(db){ try{ const mt = await req(db.transaction('p').objectStore('p').get('meta')); try{ const uf = await req(db.transaction('p').objectStore('p').get('ufx')); if(uf && uf.fx) cfg[N].fx = cleanFx(uf.fx); }catch(e){}
-  curPre = mt && typeof mt.cur === 'string' ? mt.cur : null; if(mt && Array.isArray(mt.gxf) && mt.gxf.length === 7) mt.gxf.forEach((v, k) => { if(Number.isFinite(v)) gxf[k] = Math.min(3, Math.max(0, v)); }); }catch(e){} }
+  curPre = mt && typeof mt.cur === 'string' ? mt.cur : null; if(mt && Number.isFinite(mt.stopF)){ stopFade = Math.min(3, Math.max(0, mt.stopF)); $('stopF').textContent = stopTxt(); } if(mt && Array.isArray(mt.gxf) && mt.gxf.length === 7) mt.gxf.forEach((v, k) => { if(Number.isFinite(v)) gxf[k] = Math.min(3, Math.max(0, v)); }); }catch(e){} }
   if(db){ try{ const lk = await req(db.transaction('p').objectStore('p').get('look')); if(lk && lk.cols){ const hx = /^#[0-9a-f]{6}$/i; if(['matte','metal','wood'].includes(lk.m)) look.m = lk.m; for(const k of ['matte','metal','wood']) if(hx.test(lk.cols[k] || '')) look.cols[k] = lk.cols[k]; if(['mono','duo','orig'].includes(lk.s)) look.s = lk.s; if(lk.t === 'row' || hx.test(lk.t || '')) look.t = lk.t; applyLook(); } }catch(e){} }
   for(let i = 0; i < N; i++) label(i);
   // primo avvio: se accanto a questo file c'e' preset.json, parte gia' con quei suoni e quelle immagini
