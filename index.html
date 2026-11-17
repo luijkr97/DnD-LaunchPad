@@ -4,7 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Drum Pad</title>
 <!-- versione 4: 2 pagine, preset, modalità di riproduzione -->
-<!-- build 2.14 -->
+<!-- build 2.16 -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;700&display=swap">
 <style>
 :root{--bg:#e8e5de;--pad:#d3cfc5;--edge:#bdb8ab;--ink:#23252b;--mute:#6b6a64;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
@@ -119,8 +119,11 @@ button.o{font:inherit;font-size:14px;font-weight:700;color:var(--ink);background
 .man kbd{white-space:nowrap;font:inherit;font-weight:700;border:1px solid var(--edge);border-radius:5px;padding:0 4px;background:var(--pad)}
 .man .pane[hidden]{display:none}
 .man .pane{display:flex;flex-direction:column;gap:10px}
-.wfw{display:flex;flex-direction:column;gap:2px}
-#wf{touch-action:pan-y;cursor:default}
+.wfw{display:flex;flex-direction:column;gap:2px;position:relative}
+#wf{touch-action:pan-y;cursor:pointer}
+#ed .wfw{position:sticky;top:0;z-index:4;background:var(--bg);padding:6px 0 8px}
+#wph{position:absolute;top:6px;left:0;width:2px;height:110px;margin-left:-1px;background:var(--ink,#23252b);box-shadow:0 0 0 1px rgba(255,255,255,.6);border-radius:1px;pointer-events:none;display:none}
+#wpt{position:absolute;top:10px;right:6px;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;background:rgba(0,0,0,.55);color:#fff;padding:1px 6px;border-radius:6px;pointer-events:none;display:none}
 .fxs.tr{margin:0 -9px;height:24px}
 .fxs.tr .trk{position:absolute;left:9px;right:9px;top:10px;height:4px;border-radius:2px;background:var(--edge)}
 .fxs.tr .band{top:10px}
@@ -151,7 +154,6 @@ details.adv[open]>summary{background:var(--ink);color:var(--bg);border-color:var
 #cloud[hidden]{display:none}
 #cl{display:flex;flex-direction:column;gap:8px;max-height:28vh;overflow:auto}
 .pad.drop{box-shadow:0 0 0 3px var(--ink),0 0 0 6px var(--bg,#fff) inset}
-a.lnk{font:inherit;font-size:14px;font-weight:700;color:var(--ink);border:2px solid var(--edge);border-radius:10px;padding:8px 12px;text-align:center;text-decoration:none;display:block}
 #rrBox{display:flex;flex-direction:column;gap:8px}
 #rrBox[hidden]{display:none}
 #rrList{display:flex;flex-direction:column;gap:8px;font-size:14px}
@@ -160,6 +162,12 @@ a.lnk{font:inherit;font-size:14px;font-weight:700;color:var(--ink);border:2px so
 .sheet label span{display:flex;justify-content:space-between}
 .sheet input[type=range]{width:100%;accent-color:var(--ink)}
 .row{display:flex;gap:10px}.row button{flex:1}
+#icoGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+#icoGrid[hidden]{display:none}
+#icoGrid .ico{height:auto;aspect-ratio:1;padding:9px;display:grid;place-items:center;border-radius:12px}
+#icoGrid .ico svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#icoGrid .ico svg .f{fill:currentColor;stroke:none}
+#icoGrid .ico[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .seg.w button{padding:10px}
 .grp{margin:0;font-size:14px;font-weight:700}
 .opts{display:flex;flex-direction:column;gap:8px}
@@ -307,9 +315,12 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
   <div class="row"><button class="o" id="cpCopy">Copia pad</button><button class="o" id="cpPaste" disabled>Incolla…</button></div>
   <p class="note" id="cpNote"></p>
   <div class="row"><button class="o" id="imgPick">Scegli immagine</button><button class="o" id="imgDel" hidden>Rimuovi immagine</button></div>
+  <div class="row"><button class="o" id="icoBtn" aria-expanded="false" aria-controls="icoGrid">Icone predefinite</button></div>
+  <div id="icoGrid" hidden role="group" aria-label="Icone predefinite"></div>
   <input type="file" id="imgFile" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1">
   <div class="wfw">
-    <canvas id="wf" width="600" height="220"></canvas>
+    <canvas id="wf" width="600" height="220" aria-label="Forma d'onda: tocca un punto per ascoltare da lì"></canvas>
+    <div id="wph" aria-hidden="true"></div><span id="wpt" aria-hidden="true"></span>
     <div class="fxs tr"><div class="trk"></div><div class="band" id="trBand"></div>
       <input type="range" class="rg" id="trS" min="0" max="1" step="0.001" value="0" aria-label="Inizio del suono">
       <input type="range" class="rg" id="trE" min="0" max="1" step="0.001" value="1" aria-label="Fine del suono"></div>
@@ -391,6 +402,7 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
       <tr><td>Suonare</td><td>Tocca il pad</td><td>Clic, oppure tasti <kbd>Z X C V</kbd> <kbd>A S D F</kbd> <kbd>Q W E R</kbd> <kbd>1 2 3 4</kbd> (pad 1-16 della pagina)</td></tr>
       <tr><td>Caricare o registrare un suono</td><td>Tocca un pad vuoto e scegli Carica un file o Registra con il microfono</td><td>Trascina un file audio sul pad</td></tr>
       <tr><td>Immagine sul pad</td><td>Editor, Scegli immagine</td><td>Trascina un'immagine sul pad</td></tr>
+      <tr><td>Icona sul pad</td><td colspan="2">Editor, Icone predefinite</td></tr>
       <tr><td>Spostare un pad</td><td>Tieni premuto e trascina su un altro pad</td><td>Tieni premuto il mouse e trascina</td></tr>
       <tr><td>Cambiare pagina</td><td>Scorri a sinistra o a destra sulla griglia</td><td>Tasti 1 e 2 sotto la griglia</td></tr>
       <tr><td>Cambiare pagina mentre sposti</td><td colspan="2">Tieni il pad sul tasto 1 o 2 per mezzo secondo</td></tr>
@@ -445,7 +457,8 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
         <li><b>Forma d'onda e trim:</b> la barra sotto la forma d'onda ha due maniglie, Inizio e Fine: la parte fuori dalle maniglie non suona.</li>
         <li><b>Fade in e out:</b> trascina i quadratini in alto sulla forma d'onda. La diagonale mostra la dissolvenza. Ogni fade arriva al massimo a metà della parte tagliata.</li>
         <li><b>Preamp:</b> sotto la forma d'onda, Gain (da -12 a +24 dB), Bass (graves, ±12 dB) e Treble (acuti, ±12 dB). Si sente in tempo reale mentre il pad suona e il Gain si vede subito sulla forma d'onda: le barre diventano rosse dove il suono va in saturazione.</li>
-        <li><b>Anteprima:</b> suona il pad con le impostazioni correnti.</li>
+        <li><b>Anteprima:</b> suona il pad con le impostazioni correnti. Mentre suona, una riga scorre sulla forma d'onda e in alto a destra compare il secondo a cui sei arrivato.</li>
+        <li><b>Ascoltare da un punto:</b> tocca la forma d'onda e il suono parte da lì. Il tocco fuori dalle maniglie del trim viene portato dentro la parte che suona. Il fade in si sente solo se parti dall'inizio.</li>
         <li><b>Cambia suono:</b> sostituisce l'audio e tiene modalità, gruppo, volume, random ed effetti, ma azzera taglio, fade e intonazione. Per tenere anche quelli usa l'icona con le frecce nell'elenco Suoni del pad.</li>
         <li><b>Frecce:</b> passano al pad pieno precedente o successivo.</li>
         <li><b>Svuota:</b> toglie suono, immagine, varianti, impostazioni ed effetti. Si conferma con un secondo tocco.</li>
@@ -512,10 +525,9 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
     <details><summary>Preset e cloud</summary>
       <ul>
         <li><b>Salva nuovo:</b> salva tutti i pad con un nome. <b>Aggiorna:</b> sovrascrive il preset corrente. <b>Carica:</b> sostituisce i suoni di tutti i pad.</li>
-        <li><b>Esporta e Importa file:</b> sposta un preset tra dispositivi come file. Su telefono, dopo l'esportazione si apre il menu di condivisione: scegli Drive e la cartella. Per ricaricarlo usa Importa file e scegli il file da Drive. L'esportazione di tutto il setup taglia e comprime i suoni per risparmiare spazio.</li>
+        <li><b>Esporta e Importa file:</b> sposta un preset tra dispositivi come file .json. Esporta setup attuale scarica tutti i pad; l'icona di download accanto a un preset salvato scarica quel preset, da passare a un amico. Il file finisce nei download del browser. Per ricaricarlo usa Importa file e scegli il file. L'esportazione di tutto il setup taglia e comprime i suoni per risparmiare spazio.</li>
         <li><b>Preset dal cloud:</b> l'elenco dei preset online, raggruppati per cartella. Carica sostituisce i suoni di tutti i pad.</li>
         <li><b>Cloud dell'app:</b> salva e carica i preset online, con i suoni compressi in MP3 e tagliati sulla parte usata. Limite di 20 MB per preset. Compare solo quando l'app è aperta dentro Claude.</li>
-        <li><b>Lista Preset:</b> apre la cartella Google Drive dei preset.</li>
         <li>Dopo la compressione il taglio non si può più allungare.</li>
       </ul>
     </details>
@@ -528,7 +540,7 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
       </ul>
     </details>
   </div>
-  <p class="note" style="text-align:center;font-size:11px;margin:4px 0 0">Drum Pad · versione 2.14</p>
+  <p class="note" style="text-align:center;font-size:11px;margin:4px 0 0">Drum Pad · versione 2.16</p>
   <button class="o" id="manDone">Chiudi</button>
 </div></div>
 <div id="pk" hidden><div class="sheet">
@@ -555,10 +567,8 @@ input[type=text]{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 10px
   <p class="note" id="pcur"></p>
   <button class="o" id="pUpd">Aggiorna preset corrente</button>
   <div class="row"><input type="text" id="pn" placeholder="Nome del nuovo preset" maxlength="30" aria-label="Nome del nuovo preset"><button class="o fit" id="pSave">Salva nuovo</button></div>
-  <div class="row"><button class="o" id="pExp">Esporta setup attuale</button><button class="o" id="pImp">Importa file</button></div>
-  <button class="o" id="pShare" hidden>Salva o condividi il file pronto</button>
+  <div class="row"><button class="o" id="pExp"><svg style="width:16px;height:16px;vertical-align:-3px;margin-right:6px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 20h14"/></svg>Esporta setup attuale</button><button class="o" id="pImp">Importa file</button></div>
   <input type="file" id="pFile" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" tabindex="-1">
-  <a class="lnk" href="https://drive.google.com/drive/folders/1fo_OBPHMhJQ4zsQX9KpAmzK8dhbfrw-T?usp=drive_link" target="_blank" rel="noopener noreferrer">Lista Preset</a>
   <div id="cloud" hidden>
     <p class="grp">Cloud dell'app</p>
     <button class="o" id="cSave">Salva nel cloud</button>
@@ -867,7 +877,7 @@ function pickBuf(i, p){
   if(k > 0) pickT = {s: v[k - 1].s ?? 0, e: v[k - 1].e ?? 1, fi: v[k - 1].fi, fo: v[k - 1].fo};  // ogni variante ha un taglio suo, indipendente dal pad
   return k === 0 ? bufs[i] : v[k - 1].buf;
 }
-function play(i){
+function play(i, off){
   if(!bufs[i]) return;
   A(); flash(i);
   const p = cfg[i];
@@ -876,13 +886,14 @@ function play(i){
   // i pad "Si ferma" si interrompono quando parte un altro suono
   for(let k = 0; k < N; k++) if(k !== i && cfg[k].mode === 'cut' && (!cfg[k].group || cfg[k].group === p.group)) stopV(k, gxf[p.group]);
   if(p.mode === 'cut') stopV(i, gxf[p.group]);
-  const s = ctx.createBufferSource(), g = ctx.createGain(), t = ctx.currentTime, b = pickBuf(i, p), T = b.duration;
+  const seek = off !== undefined;  // off: punto di partenza (0-1 della durata del file), per ascoltare da dove si tocca la forma d'onda
+  const s = ctx.createBufferSource(), g = ctx.createGain(), t = ctx.currentTime, b = seek ? (pickT = null, bufs[i]) : pickBuf(i, p), T = b.duration;
   // random: percentuale dell'intera scala dell'intonazione (\u00b1100% = \u00b112 semitoni)
   const rnd = p.rndOn && p.rpOn ? (p.rpLo + Math.random() * (p.rpHi - p.rpLo)) * .12 : 0;
   const rt = Math.pow(2, Math.max(-12, Math.min(12, (p.pitch || 0) + rnd)) / 12);
   const ts = pickT ? pickT.s : p.start, te = pickT ? pickT.e : p.end;
-  const a = ts * T, d = (te - ts) * T, v = 1, rd = d / rt;  // l'inviluppo lavora a 1: il volume del pad sta in un nodo a parte, cosi' si sente in tempo reale
-  const fi = Math.min(pickT && pickT.fi !== undefined ? pickT.fi : p.fin, rd / 2), fo = Math.min(pickT && pickT.fo !== undefined ? pickT.fo : p.fout, rd / 2);
+  const a = ts * T, d = (te - ts) * T, o = seek ? Math.min(a + d - .01, Math.max(a, off * T)) : a, od = seek ? a + d - o : d, v = 1, rd = od / rt;  // l'inviluppo lavora a 1: il volume del pad sta in un nodo a parte, cosi' si sente in tempo reale
+  const fi = seek && o > a + .005 ? 0 : Math.min(pickT && pickT.fi !== undefined ? pickT.fi : p.fin, rd / 2), fo = Math.min(pickT && pickT.fo !== undefined ? pickT.fo : p.fout, rd / 2);
   const xb = p.loop && p.xf > .005 ? xfBuf(i, b, p) : null;
   s.buffer = xb || b; s.loop = p.loop; s.playbackRate.value = rt;
   if(p.loop){ s.loopStart = xb ? 0 : a; s.loopEnd = xb ? xb.duration : a + d; }
@@ -894,10 +905,11 @@ function play(i){
   }
   const vg = ctx.createGain(); vg.gain.value = p.vol;
   s.connect(g).connect(vg).connect(outNode(i));
-  if(p.loop) s.start(t, xb ? 0 : a); else { s.start(t, a, d); s.stop(t + rd + .05); }
-  const vo = {s, g, vg};
+  if(p.loop) s.start(t, xb ? Math.min(xb.duration - .001, o - a) : o); else { s.start(t, o, od); s.stop(t + rd + .05); }
+  const vo = {s, g, vg, t0: t, o: xb ? o - a : o, rt, lp: !!p.loop, ls: xb ? 0 : a, le: xb ? xb.duration : a + d, base: xb ? a : 0, T, main: b === bufs[i]};
   voices[i].push(vo);
   if(p.loop || p.mode === 'hold') els[i].classList.add('on');
+  if(i === ed) phStart();
   s.onended = () => {
     const j = voices[i].indexOf(vo);
     if(j > -1) voices[i].splice(j, 1);
@@ -912,7 +924,7 @@ async function loadInto(f, t){
     stopV(t);
     bufs[t] = b; raw[t] = ab; { const o = cfg[t]; cfg[t] = Object.assign(dcfg(), {loop: o.loop, mode: o.mode, group: o.group, vol: o.vol, rndOn: o.rndOn, rpOn: o.rpOn, rpLo: o.rpLo, rpHi: o.rpHi, fx: o.fx, fxm: o.fxm, pre: o.pre}); } dix[t] = null; vars[t] = []; lastV[t] = undefined;
     names[t] = f.name.replace(/\.[^.]+$/, '');
-    label(t); put(t); play(t);
+    label(t); put(t);
     hint('Suono salvato sul pad ' + (t + 1) + '.');
   }catch(err){
     hint('Non riesco a leggere questo file. Prova con MP3, WAV, M4A o AIFF.');
@@ -959,6 +971,24 @@ function paintWave(cv, b, p, color){
   x.fillStyle = ink;
   for(const hx of [fx, ox]){ x.beginPath(); x.roundRect(hx - hs / 2, top - hs / 2, hs, hs, 3); x.fill(); }
 }
+// indicatore di posizione: una riga che scorre sulla forma d'onda mentre il pad suona nell'editor
+let phRaf = 0;
+function phHide(){ $('wph').style.display = 'none'; $('wpt').style.display = 'none'; }
+function phTick(){
+  phRaf = 0;
+  if(ed < 0 || $('ed').hidden || !ctx){ phHide(); return; }
+  const vs = voices[ed], vo = vs.length ? vs[vs.length - 1] : null;
+  if(!vo){ phHide(); return; }
+  if(vo.main){
+    let pos = vo.o + Math.max(0, ctx.currentTime - vo.t0) * vo.rt;
+    if(vo.lp && pos >= vo.le) pos = vo.ls + ((pos - vo.ls) % (vo.le - vo.ls));
+    const tt = Math.min(vo.T, pos + vo.base);
+    $('wph').style.display = 'block'; $('wph').style.left = (tt / vo.T * 100) + '%';
+    $('wpt').style.display = 'block'; $('wpt').textContent = tt.toFixed(2) + ' s';
+  }else phHide();
+  phRaf = requestAnimationFrame(phTick);
+}
+function phStart(){ if(!phRaf) phRaf = requestAnimationFrame(phTick); }
 function draw(){ paintWave($('wf'), bufs[ed], cfg[ed], els[ed].style.getPropertyValue('--c')); }
 // get() -> {b, p:{start,end,fin,fout}, setIn(sec), setOut(sec), done()} oppure null
 function wireFades(cv, get){
@@ -970,7 +1000,7 @@ function wireFades(cv, get){
     const fx = (g.p.start * T + g.p.fin) / T * W, ox = (g.p.end * T - g.p.fout) / T * W;
     const da = Math.abs(q.x - fx), db = Math.abs(q.x - ox);
     if(q.y > cv.height * .5 || Math.min(da, db) > 40) return;
-    drag = {k: da < db || (da === db && q.x < (fx + ox) / 2) ? 'in' : 'out', id: e.pointerId};
+    drag = {k: da < db || (da === db && q.x < (fx + ox) / 2) ? 'in' : 'out', id: e.pointerId}; cv._fd = true;
     cv.setPointerCapture(e.pointerId); e.preventDefault();
   });
   cv.addEventListener('pointermove', e => {
@@ -980,10 +1010,23 @@ function wireFades(cv, get){
     if(drag.k === 'in') g.setIn(Math.min(half, Math.max(0, t - g.p.start * T)));
     else g.setOut(Math.min(half, Math.max(0, g.p.end * T - t)));
   });
-  const end = e => { if(drag && e.pointerId === drag.id){ drag = null; const g = get(); if(g) g.done(); } };
+  const end = e => { if(drag && e.pointerId === drag.id){ drag = null; cv._fd = false; const g = get(); if(g) g.done(); } };
   cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
 }
 wireFades($('wf'), () => ed < 0 ? null : {b: bufs[ed], p: cfg[ed], setIn: v => { $('fi').value = v.toFixed(2); sync(); }, setOut: v => { $('fo').value = v.toFixed(2); sync(); }, done: () => put(ed)});
+// un tocco sulla forma d'onda (fuori dalle maniglie dei fade) fa ascoltare il suono da quel punto
+{
+  const cv = $('wf'); let sk = null;
+  cv.addEventListener('pointerdown', e => { sk = {x: e.clientX, y: e.clientY, id: e.pointerId, ok: !cv._fd}; });
+  cv.addEventListener('pointerup', e => {
+    if(!sk || sk.id !== e.pointerId) return;
+    const q = sk; sk = null;
+    if(!q.ok || ed < 0 || !bufs[ed] || Math.hypot(e.clientX - q.x, e.clientY - q.y) > 10) return;
+    const r = cv.getBoundingClientRect();
+    stopV(ed); play(ed, Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)));
+  });
+  cv.addEventListener('pointercancel', () => { sk = null; });
+}
 $('trS').oninput = () => { $('ts').value = Math.min(+$('trS').value, +$('te').value - .02).toFixed(3); sync(); };
 $('trE').oninput = () => { $('te').value = Math.max(+$('trE').value, +$('ts').value + .02).toFixed(3); sync(); };
 $('trS').onchange = $('trE').onchange = () => put(ed);
@@ -1055,7 +1098,7 @@ function openEd(i){
   $('fi').value = q.fin; $('fo').value = q.fout; $('pt').value = q.pitch || 0; { const r = q.pre || {}; $('prG').value = r.g || 0; $('prB').value = r.b || 0; $('prT').value = r.t || 0; } $('xf').max = Math.min(5, (q.end - q.start) * bufs[i].duration / 2).toFixed(2); $('xf').value = q.xf || 0;
   $('adv').open = false;
   $('nm').value = names[i] || '';
-  syncImg();
+  icoClose(); syncImg();
   $('edT').textContent = 'Pad ' + (i + 1) + ': ' + nm(i);
   cpUi(); $('ed').hidden = false; sync();
 }
@@ -1210,7 +1253,34 @@ function toDataUrl(file){
 function syncImg(){
   $('imgPick').textContent = imgs[ed] ? 'Cambia immagine' : 'Scegli immagine';
   $('imgDel').hidden = !imgs[ed];
+  if(!$('icoGrid').hidden) icoMark();
 }
+// Icone predefinite: disegni semplici da mettere sul pad per riconoscerlo a colpo d'occhio. Diventano un'immagine come le altre, quindi si salvano con i preset.
+const ICONS = [{n:"Cassa",s:["M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0", "M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"],f:[]},{n:"Rullante",s:["M4 9a8 3 0 1 0 16 0a8 3 0 1 0 -16 0", "M4 9v7a8 3 0 0 0 16 0V9"],f:[]},{n:"Hi-hat",s:["M4 9Q12 5 20 9", "M4 12Q12 16 20 12", "M12 14v7", "M8 21h8"],f:[]},{n:"Piatto",s:["M3 9Q12 3 21 9Q12 11 3 9Z", "M12 10v11", "M8 21h8"],f:[]},{n:"Clap",s:["M5 19l6-8", "M19 19l-6-8", "M12 3v3", "M6 5l2 2", "M18 5l-2 2"],f:[]},{n:"Cowbell",s:["M7 7h10l3 13H4Z", "M10 7V3h4v4"],f:[]},{n:"Shaker",s:["M4 15l5 5 11-11-5-5Z"],f:["M9 13a.9 .9 0 1 0 1.8 0a.9 .9 0 1 0 -1.8 0", "M12 10a.9 .9 0 1 0 1.8 0a.9 .9 0 1 0 -1.8 0", "M13 15a.9 .9 0 1 0 1.8 0a.9 .9 0 1 0 -1.8 0"]},{n:"Tamburello",s:["M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"],f:["M10 6.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0", "M10 17.5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0", "M4.5 12a2 2 0 1 0 4 0a2 2 0 1 0 -4 0", "M15.5 12a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"]},{n:"Bacchette",s:["M6 5l13 14", "M18 5L5 19"],f:["M3 4a2 2 0 1 0 4 0a2 2 0 1 0 -4 0", "M17 4a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"]},{n:"Voce",s:["M9 5a3 3 0 0 1 6 0v6a3 3 0 0 1 -6 0Z", "M5 11a7 7 0 0 0 14 0", "M12 18v3", "M9 21h6"],f:[]},{n:"Tastiera",s:["M3 6h18v12H3Z", "M9 12v6", "M15 12v6"],f:["M7 6h3v6H7Z", "M14 6h3v6h-3Z"]},{n:"Nota",s:["M9 18V6l10-2v12"],f:["M4 18a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0", "M14 16a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0"]},{n:"Onda",s:["M3 12c2-8 4-8 6 0s4 8 6 0 4-8 6 0"],f:[]},{n:"Lampo",s:["M13 2L5 14h6l-1 8 8-12h-6Z"],f:[]},{n:"Basso",s:["M4 9h4l5-4v14l-5-4H4Z", "M16 9a4 4 0 0 1 0 6", "M18.5 6.5a8 8 0 0 1 0 11"],f:[]},{n:"Loop",s:["M4 12v-1a4 4 0 0 1 4-4h12", "M17 3l3 4-3 4", "M20 12v1a4 4 0 0 1-4 4H4", "M7 21l-3-4 3-4"],f:[]}];
+const icoPng = [];
+function iconPng(k){
+  if(icoPng[k]) return icoPng[k];
+  const c = document.createElement('canvas'); c.width = c.height = 320;
+  const x = c.getContext('2d'), ic = ICONS[k];
+  x.fillStyle = '#17181b'; x.fillRect(0, 0, 320, 320);
+  x.save(); x.translate(60, 40); x.scale(8.5, 8.5);
+  x.strokeStyle = x.fillStyle = '#f1f1f1'; x.lineWidth = 1.7; x.lineCap = x.lineJoin = 'round';
+  ic.s.forEach(d => x.stroke(new Path2D(d))); ic.f.forEach(d => x.fill(new Path2D(d)));
+  x.restore();
+  return icoPng[k] = c.toDataURL('image/png');
+}
+function icoMark(){ $('icoGrid').querySelectorAll('.ico').forEach((b, k) => b.setAttribute('aria-pressed', ed >= 0 && !!imgs[ed] && imgs[ed] === iconPng(k))); }
+function icoClose(){ $('icoGrid').hidden = true; $('icoBtn').setAttribute('aria-expanded', 'false'); }
+$('icoBtn').onclick = () => {
+  const g = $('icoGrid');
+  if(!g.children.length) ICONS.forEach((ic, k) => {
+    const b = document.createElement('button'); b.className = 'o ico'; b.title = ic.n; b.setAttribute('aria-label', 'Icona ' + ic.n);
+    b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + ic.s.map(d => '<path d="' + d + '"/>').join('') + ic.f.map(d => '<path class="f" d="' + d + '"/>').join('') + '</svg>';
+    b.onclick = () => { if(ed < 0) return; imgs[ed] = iconPng(k); label(ed); put(ed); syncImg(); };
+    g.append(b);
+  });
+  g.hidden = !g.hidden; $('icoBtn').setAttribute('aria-expanded', !g.hidden); if(!g.hidden) icoMark();
+};
 $('imgPick').onclick = () => $('imgFile').click();
 $('imgFile').addEventListener('change', async e => {
   const f = e.target.files[0]; e.target.value = '';
@@ -1460,7 +1530,7 @@ document.addEventListener('keydown', e => {
 });
 
 // ===== Suggerimenti a scorrimento: swipe o tocco ai bordi del display =====
-const TIPLIST = ["Shortcut: Z X C V · A S D F · Q W E R · 1 2 3 4 suonano i pad.", "Shortcut: i tasti 7 8 9 0 attivano Comp, Reverb, Delay, Drive.", "Shortcut: tasto destro su un pad apre l’editor.", "Shortcut: Maiusc + destro su un pad apre gli effetti.", "Shortcut: Ctrl + destro e scorri su un pad per il volume.", "Shortcut: Esc chiude finestre e modalità.", "Shortcut: in Edit, C copia e V incolla le impostazioni.", "Shortcut: nell’editor, Spazio = anteprima, L = Loop / One shot.", "Shortcut: nell’editor, ← → passano al pad vicino.", "Shortcut: tieni Ctrl premuto per vedere i volumi dei pad.", "Shortcut: in User tieni premuto 7 8 9 0 mentre suoni.", "Consiglio: tieni premuto un pad per spostarlo.", "Consiglio: porta un pad sul tasto 1 o 2 per cambiare pagina.", "Consiglio: Copia e Incolla clona i settaggi tra pad.", "Consiglio: varianti round robin per un suono più naturale.", "Consiglio: per i loop usa il Crossfade, il giro sarà più fluido.", "Consiglio: in Stop con gruppo, un pad ne zittisce un altro.", "Consiglio: la R negli effetti sceglie un valore a caso.", "Consiglio: il dado in User varia gli effetti a ogni tocco.", "Consiglio: Master FX 0% = suono pulito.", "Consiglio: se il suono satura (barre rosse) abbassa il Gain.", "Consiglio: taglia il silenzio iniziale per pad più reattivi.", "Consiglio: esporta i preset per avere sempre un backup.", "Consiglio: su un pad vuoto puoi registrare con il microfono.", "Consiglio: la tavolozza in Edit cambia look.", "Consiglio: l’icona frecce cambia suono e tiene gli effetti.", "Consiglio: usa On/Off per avviare e fermare un loop con un tocco."];
+const TIPLIST = ["Shortcut: Z X C V · A S D F · Q W E R · 1 2 3 4 suonano i pad.", "Shortcut: i tasti 7 8 9 0 attivano Comp, Reverb, Delay, Drive.", "Shortcut: tasto destro su un pad apre l’editor.", "Shortcut: Maiusc + destro su un pad apre gli effetti.", "Shortcut: Ctrl + destro e scorri su un pad per il volume.", "Shortcut: Esc chiude finestre e modalità.", "Shortcut: in Edit, C copia e V incolla le impostazioni.", "Shortcut: nell’editor, Spazio = anteprima, L = Loop / One shot.", "Shortcut: nell’editor, ← → passano al pad vicino.", "Shortcut: tieni Ctrl premuto per vedere i volumi dei pad.", "Shortcut: in User tieni premuto 7 8 9 0 mentre suoni.", "Consiglio: tieni premuto un pad per spostarlo.", "Consiglio: porta un pad sul tasto 1 o 2 per cambiare pagina.", "Consiglio: Copia e Incolla clona i settaggi tra pad.", "Consiglio: varianti round robin per un suono più naturale.", "Consiglio: per i loop usa il Crossfade, il giro sarà più fluido.", "Consiglio: in Stop con gruppo, un pad ne zittisce un altro.", "Consiglio: la R negli effetti sceglie un valore a caso.", "Consiglio: il dado in User varia gli effetti a ogni tocco.", "Consiglio: Master FX 0% = suono pulito.", "Consiglio: se il suono satura (barre rosse) abbassa il Gain.", "Consiglio: taglia il silenzio iniziale per pad più reattivi.", "Consiglio: esporta i preset per avere sempre un backup.", "Consiglio: su un pad vuoto puoi registrare con il microfono.", "Consiglio: la tavolozza in Edit cambia look.", "Consiglio: l’icona frecce cambia suono e tiene gli effetti.", "Consiglio: usa On/Off per avviare e fermare un loop con un tocco.", "Consiglio: nell’editor tocca la forma d’onda per ascoltare da lì.", "Consiglio: nell’editor puoi dare a ogni pad un’icona."];
 for(let k = TIPLIST.length - 1; k > 0; k--){ const j = Math.floor(Math.random() * (k + 1)); [TIPLIST[k], TIPLIST[j]] = [TIPLIST[j], TIPLIST[k]]; }
 let tipI = -1, tipDown = null;
 function tipStep(d){ tipI = tipI < 0 ? 0 : (tipI + d + TIPLIST.length) % TIPLIST.length; hint(TIPLIST[tipI]); }
@@ -1690,7 +1760,7 @@ async function listPresets(){
       if(curPre === rec.name){ curPre = null; saveMeta(); renderCur(); }
       pmsg('Preset «' + rec.name + '» eliminato.'); listPresets();
     });
-    const x = document.createElement('button'); x.className = 'o'; x.textContent = 'Esporta'; x.onclick = () => exportRec(rec);
+    const x = document.createElement('button'); x.className = 'o pv'; x.setAttribute('aria-label', 'Scarica «' + rec.name + '» come file .json'); x.title = 'Scarica il file .json'; x.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 20h14"/></svg>'; x.onclick = () => exportRec(rec);
     row.append(n, l, x, d); box.append(row);
   });
 }
@@ -2240,7 +2310,6 @@ function buildRec(o, n){
     vars: Array.isArray(p.vars) ? p.vars.slice(0, 12).filter(v => v && typeof v.data === 'string').map(v => ({name: typeof v.name === 'string' ? v.name.slice(0, 60) : 'Variante', data: fromB64(v.data), s: Number.isFinite(v.s) ? Math.min(1, Math.max(0, v.s)) : undefined, e: Number.isFinite(v.e) ? Math.min(1, Math.max(0, v.e)) : undefined, fi: Number.isFinite(v.fi) ? Math.min(60, Math.max(0, v.fi)) : undefined, fo: Number.isFinite(v.fo) ? Math.min(60, Math.max(0, v.fo)) : undefined})) : []
   }; })};
 }
-let pendingShare = null;
 async function saveFile(name, blob){
   let dl = null;
   try{ if(typeof claude !== 'undefined') dl = await claude.use('downloads'); }catch(e){}
@@ -2248,28 +2317,12 @@ async function saveFile(name, blob){
     try{ await dl.save({filename: name, data: blob}); pmsg('File pronto: ' + name); return; }
     catch(e){ if(e && e.code === 'declined'){ pmsg('Salvataggio annullato.'); return; } }
   }
-  // sul telefono: menu di condivisione, dove si sceglie Drive e la cartella
-  let file = null;
-  try{ file = new File([blob], name, {type: 'application/json'}); }catch(e){}
-  if(file && navigator.canShare && navigator.canShare({files: [file]})){
-    $('pShare').hidden = true; pendingShare = null;
-    try{ await navigator.share({files: [file], title: name}); pmsg('Fatto: ' + name + ' (' + mb(blob.size) + ').'); return; }
-    catch(e){
-      if(e && e.name === 'AbortError'){ pmsg('Condivisione annullata.'); return; }
-      // dopo la compressione il telefono vuole un nuovo tocco per aprire il menu
-      pendingShare = file; $('pShare').hidden = false; pmsg('File pronto (' + mb(blob.size) + '): tocca il pulsante qui sotto per salvarlo su Drive.'); return;
-    }
-  }
+  // download diretto: il file finisce nei download del browser
   const u = URL.createObjectURL(blob), a = document.createElement('a');
-  a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(u), 4000);
-  pmsg('File scaricato: ' + name + ' (' + mb(blob.size) + ').');
+  a.href = u; a.download = name; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 60000);
+  pmsg('File scaricato: ' + name + ' (' + mb(blob.size) + '). Lo trovi nei download del browser.');
 }
-$('pShare').onclick = async () => {
-  if(!pendingShare) return;
-  try{ await navigator.share({files: [pendingShare], title: pendingShare.name}); pmsg('Fatto: ' + pendingShare.name + '.'); $('pShare').hidden = true; pendingShare = null; }
-  catch(e){ if(e && e.name === 'AbortError') pmsg('Condivisione annullata.'); else pmsg('Non riesco ad aprire il menu di condivisione: riprova.'); }
-};
 function exportRec(rec){
   const o = {app: 'drumpad', v: 1, name: rec.name, pads: rec.pads.map(p => ({name: p.name || null, data: p.data ? toB64(p.data) : null, cfg: p.cfg, img: p.img || null, dx: p.dx, vars: (p.vars || []).map(v => ({name: v.name, data: toB64(v.data), s: v.s, e: v.e, fi: v.fi, fo: v.fo}))}))};
   saveFile('drumpad-' + (rec.name.replace(/[^\w\- ]+/g, '').trim() || 'preset') + '.json', new Blob([JSON.stringify(o)], {type: 'application/json'}));
